@@ -1,45 +1,35 @@
-# rust-code-analysis
+# singularity-code-analysis
 
-[![Crates.io](https://img.shields.io/crates/v/rust-code-analysis.svg)](https://crates.io/crates/rust-code-analysis)
-[![Task Status](https://community-tc.services.singularity.com/api/github/v1/repository/singularity/rust-code-analysis/master/badge.svg)](https://community-tc.services.singularity.com/api/github/v1/repository/singularity/rust-code-analysis/master/latest)
-[![codecov](https://codecov.io/gh/singularity/rust-code-analysis/branch/master/graph/badge.svg)](https://codecov.io/gh/singularity/rust-code-analysis)
-<a href="https://chat.singularity.org/#/room/#rust-code-analysis:singularity.org" target="_blank">
-   <img src="https://img.shields.io/badge/chat%20on%20[m]-%23rust--code--analysis%3Asingularity.org-blue">
-</a>
+[![Crates.io](https://img.shields.io/crates/v/singularity-code-analysis.svg)](https://crates.io/crates/singularity-code-analysis)
 
-**rust-code-analysis** is a Rust library to analyze and extract information
+**singularity-code-analysis** is a Rust library to analyze and extract information
 from source code written in many different programming languages.
 It is based on a parser generator tool and an incremental parsing library
 called
 <a href="https://tree-sitter.github.io/tree-sitter/" target="_blank">Tree Sitter</a>.
 
+This library is a fork of [Mozilla rust-code-analysis](https://github.com/mozilla/rust-code-analysis)
+with enhanced support for BEAM languages (Elixir, Erlang, Gleam) and additional
+code complexity metrics.
 
-A command line tool called **rust-code-analysis-cli** is provided to interact with the API of the library in an easy way.
+## Features
 
-This tool can be used to:
+- **Multi-language support**: Rust, Python, JavaScript/TypeScript, Java, C/C++, Elixir, Erlang, Gleam, and more
+- **Comprehensive metrics**: Cyclomatic complexity, Halstead metrics, Maintainability Index, Lines of Code
+- **BEAM language support**: Enhanced parsing and analysis for Elixir, Erlang, and Gleam
+- **Tree-sitter integration**: Fast, incremental parsing with Tree-sitter 0.25.10
+- **Command-line interface**: Easy-to-use CLI for analyzing codebases
+- **Web API**: REST API for web-based code analysis
 
-- Call **rust-code-analysis** API
-- Print nodes and metrics information
-- Export metrics in different formats
+## Usage
 
-In addition, we provide a **rust-code-analysis-web** tool to use the library through a REST API.
-
-
-# Usage
-
-**rust-code-analysis** supports many types of programming languages and
+**singularity-code-analysis** supports many types of programming languages and
 computes a great variety of metrics. You can find up to date documentation at
-<a href="https://singularity.github.io/rust-code-analysis/index.html" target="_blank">Documentation</a>.
-
-On the
-<a href="https://singularity.github.io/rust-code-analysis/commands/index.html" target="_blank">
-    Commands
-</a> page, there is a list of commands that can be run to get information
-about metrics, nodes, and other general data provided by this software.
+<a href="https://docs.rs/singularity-code-analysis" target="_blank">Documentation</a>.
 
 ## Building
 
-To build the `rust-code-analysis` library, you need to run the following
+To build the `singularity-code-analysis` library, you need to run the following
 command:
 
 ```console
@@ -49,73 +39,92 @@ cargo build
 If you want to build the `cli`:
 
 ```console
-cargo build -p rust-code-analysis-cli
+cargo build --bin singularity-code-analysis-cli
 ```
 
-If you want to build the `web` server:
+## Installation
 
-```console
-cargo build -p rust-code-analysis-web
+Add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+singularity-code-analysis = "0.1.0"
 ```
 
-If you want to build everything in one fell swoop:
+## Examples
 
-```console
-cargo build --workspace
+### Basic Usage
+
+```rust
+use singularity_code_analysis::{get_function_spaces, get_metrics};
+
+fn main() {
+    // Analyze a Rust file
+    let source_code = r#"
+fn main() {
+    println!("Hello, world!");
+}
+"#;
+
+    // Get metrics
+    let metrics = get_metrics("rust", source_code, "main.rs").unwrap();
+    println!("Cyclomatic complexity: {}", metrics.cyclomatic.cyclomatic);
+
+    // Get function spaces
+    let spaces = get_function_spaces("rust", source_code, "main.rs").unwrap();
+    for space in spaces {
+        println!("Function: {}", space.name);
+    }
+}
 ```
+
+### Supported Languages
+
+- **Rust** - Full support with advanced metrics
+- **Python** - Complete analysis including function complexity
+- **JavaScript/TypeScript** - Modern JS/TS support
+- **Java** - Object-oriented metrics
+- **C/C++** - System programming analysis
+- **Elixir** - Enhanced BEAM language support
+- **Erlang** - Functional programming metrics
+- **Gleam** - Modern functional language analysis
+- **And many more...**
+
+## BEAM Language Enhancements
+
+This fork includes special enhancements for BEAM languages:
+
+- **Elixir**: Improved macro analysis and module structure detection
+- **Erlang**: Enhanced function clause and pattern matching analysis
+- **Gleam**: Support for modern functional programming constructs
+
+## Metrics
+
+The library computes various software metrics:
+
+- **Cyclomatic Complexity**: Measures code complexity based on control flow
+- **Halstead Metrics**: Volume, difficulty, effort, and time estimates
+- **Maintainability Index**: Overall code maintainability score
+- **Lines of Code**: Physical and logical LOC metrics
+- **Function Spaces**: Detailed function-level analysis
 
 ## Testing
 
 To verify whether all tests pass, run the `cargo test` command.
 
 ```console
-cargo test --workspace --all-features --verbose
+cargo test
 ```
 
-### Updating insta tests
-We use [insta](https://insta.rs), to update the snapshot tests you should install [cargo insta](https://crates.io/crates/cargo-insta)
+## Contributing
 
-``` console
-cargo insta test --review
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Will run the tests, generate the new snapshot references and let you review them.
+## License
 
-### Updating grammars
-Have a look at
-<a href="https://singularity.github.io/rust-code-analysis/developers/update-grammars.html" target="_blank">Update grammars guide</a>
-to learn how to update languages grammars.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Contributing
+## Acknowledgments
 
-If you want to contribute to the development of this software, have a look at the
-guidelines contained in our
-<a href="https://singularity.github.io/rust-code-analysis/developers/index.html" target="_blank">Developers Guide</a>.
-
-
-# How to cite rust-code-analysis
-
-```
-@article{ARDITO2020100635,
-    title = {rust-code-analysis: A Rust library to analyze and extract maintainability information from source codes},
-    journal = {SoftwareX},
-    volume = {12},
-    pages = {100635},
-    year = {2020},
-    issn = {2352-7110},
-    doi = {https://doi.org/10.1016/j.softx.2020.100635},
-    url = {https://www.sciencedirect.com/science/article/pii/S2352711020303484},
-    author = {Luca Ardito and Luca Barbato and Marco Castelluccio and Riccardo Coppola and Calixte Denizet and Sylvestre Ledru and Michele Valsesia},
-    keywords = {Algorithm, Software metrics, Software maintainability, Software quality},
-    abstract = {The literature proposes many software metrics for evaluating the source code non-functional properties, such as its complexity and maintainability. The literature also proposes several tools to compute those properties on source codes developed with many different software languages. However, the Rust language emergence has not been paired by the community’s effort in developing parsers and tools able to compute metrics for the Rust source code. Also, metrics tools often fall short in providing immediate means of comparing maintainability metrics between different algorithms or coding languages. We hence introduce rust-code-analysis, a Rust library that allows the extraction of a set of eleven maintainability metrics for ten different languages, including Rust. rust-code-analysis, through the Abstract Syntax Tree (AST) of a source file, allows the inspection of the code structure, analyzing source code metrics at different levels of granularity, and finding code syntax errors before compiling time. The tool also offers a command-line interface that allows exporting the results in different formats. The possibility of analyzing source codes written in different programming languages enables simple and systematic comparisons between the metrics produced from different empirical and large-scale analysis sources.}
-}
-```
-
-
-# Licenses
-
-- Singularity-defined grammars are released under the MIT license.
-
-- **rust-code-analysis**, **rust-code-analysis-cli** and **rust-code-analysis-web**
-are released under the
-<a href="https://www.singularity.org/MPL/2.0/" target="_blank">Singularity Public License v2.0</a>.
+This library is a fork of [Mozilla rust-code-analysis](https://github.com/mozilla/rust-code-analysis).
+Special thanks to the Mozilla team for their excellent work on code analysis tools.

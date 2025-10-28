@@ -6,7 +6,7 @@ edition = "2021"
 description = "Modernized complexity analyzer based on Singularity rust-code-analysis"
 license = "MIT OR Apache-2.0"
 keywords = ["metrics", "complexity", "analysis"]
-repository = "https://github.com/claude-code-zen/zenflow"
+repository = "https://github.com/mikkihugo/singularity-code-analysis"
 categories = ["development-tools", "parsing"]
 
 [dependencies]
