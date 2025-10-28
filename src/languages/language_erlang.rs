@@ -24,7 +24,7 @@ pub enum Erlang {
     ExportAttribute = 160,
     ImportAttribute = 161,
     OptionalCallbacksAttribute = 162,
-    FA = 163,  // Function/Arity pair
+    FA = 163, // Function/Arity pair
     ExportTypeAttribute = 164,
 
     // Type system
@@ -78,7 +78,7 @@ pub enum Erlang {
     IfExpr = 255,
     IfClause = 256,
     CaseExpr = 257,
-    CrClause = 260,  // Case/Receive clause
+    CrClause = 260, // Case/Receive clause
     ReceiveExpr = 261,
     ReceiveAfter = 262,
     TryExpr = 271,
@@ -108,15 +108,15 @@ impl From<u16> for Erlang {
 }
 
 impl PartialEq<u16> for Erlang {
-  #[inline(always)]
-  fn eq(&self, x: &u16) -> bool {
-    *self == Into::<Self>::into(*x)
-  }
+    #[inline(always)]
+    fn eq(&self, x: &u16) -> bool {
+        *self == Into::<Self>::into(*x)
+    }
 }
 
 impl PartialEq<Erlang> for u16 {
-  #[inline(always)]
-  fn eq(&self, x: &Erlang) -> bool {
-    *x == *self
-  }
+    #[inline(always)]
+    fn eq(&self, x: &Erlang) -> bool {
+        *x == *self
+    }
 }

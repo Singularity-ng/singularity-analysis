@@ -72,15 +72,15 @@ impl From<u16> for Elixir {
 }
 
 impl PartialEq<u16> for Elixir {
-  #[inline(always)]
-  fn eq(&self, x: &u16) -> bool {
-    *self == Into::<Self>::into(*x)
-  }
+    #[inline(always)]
+    fn eq(&self, x: &u16) -> bool {
+        *self == Into::<Self>::into(*x)
+    }
 }
 
 impl PartialEq<Elixir> for u16 {
-  #[inline(always)]
-  fn eq(&self, x: &Elixir) -> bool {
-    *x == *self
-  }
+    #[inline(always)]
+    fn eq(&self, x: &Elixir) -> bool {
+        *x == *self
+    }
 }

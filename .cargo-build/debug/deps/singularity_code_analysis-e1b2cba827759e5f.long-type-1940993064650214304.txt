@@ -1,0 +1,1 @@
+HashMap<langs::LANG, Box<(dyn ParserFactory + 'static)>>

@@ -13,8 +13,8 @@ pub enum Gleam {
     Comment = 3,
 
     // Modifiers
-    VisibilityModifier = 63,  // pub
-    OpacityModifier = 64,      // opaque
+    VisibilityModifier = 63, // pub
+    OpacityModifier = 64,    // opaque
 
     // Literals
     Float = 69,
@@ -125,7 +125,7 @@ pub enum Gleam {
 
     // Special values
     Identifier = 235,
-    Discard = 237,  // underscore _
+    Discard = 237, // underscore _
 }
 
 impl From<u16> for Gleam {
@@ -135,15 +135,15 @@ impl From<u16> for Gleam {
 }
 
 impl PartialEq<u16> for Gleam {
-  #[inline(always)]
-  fn eq(&self, x: &u16) -> bool {
-    *self == Into::<Self>::into(*x)
-  }
+    #[inline(always)]
+    fn eq(&self, x: &u16) -> bool {
+        *self == Into::<Self>::into(*x)
+    }
 }
 
 impl PartialEq<Gleam> for u16 {
-  #[inline(always)]
-  fn eq(&self, x: &Gleam) -> bool {
-    *x == *self
-  }
+    #[inline(always)]
+    fn eq(&self, x: &Gleam) -> bool {
+        *x == *self
+    }
 }

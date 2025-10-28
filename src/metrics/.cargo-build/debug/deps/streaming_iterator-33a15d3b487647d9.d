@@ -1,0 +1,9 @@
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/debug/deps/streaming_iterator-33a15d3b487647d9.d: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/slice.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/sources.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/debug/deps/libstreaming_iterator-33a15d3b487647d9.rlib: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/slice.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/sources.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/debug/deps/libstreaming_iterator-33a15d3b487647d9.rmeta: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/slice.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/sources.rs
+
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/lib.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/slice.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/streaming-iterator-0.1.9/src/sources.rs:

@@ -59,15 +59,15 @@ impl From<u16> for Lua {
 }
 
 impl PartialEq<u16> for Lua {
-  #[inline(always)]
-  fn eq(&self, x: &u16) -> bool {
-    *self == Into::<Self>::into(*x)
-  }
+    #[inline(always)]
+    fn eq(&self, x: &u16) -> bool {
+        *self == Into::<Self>::into(*x)
+    }
 }
 
 impl PartialEq<Lua> for u16 {
-  #[inline(always)]
-  fn eq(&self, x: &Lua) -> bool {
-    *x == *self
-  }
+    #[inline(always)]
+    fn eq(&self, x: &Lua) -> bool {
+        *x == *self
+    }
 }

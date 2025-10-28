@@ -1,16 +1,16 @@
 macro_rules! get_language {
-  (tree_sitter_cpp) => {
-    tree_sitter_cpp::LANGUAGE.into()
-  };
-  (tree_sitter_typescript) => {
-    tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into()
-  };
-  (tree_sitter_tsx) => {
-    tree_sitter_typescript::LANGUAGE_TSX.into()
-  };
-  ($name:ident) => {
-    $name::LANGUAGE.into()
-  };
+    (tree_sitter_cpp) => {
+        tree_sitter_cpp::LANGUAGE.into()
+    };
+    (tree_sitter_typescript) => {
+        tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into()
+    };
+    (tree_sitter_tsx) => {
+        tree_sitter_typescript::LANGUAGE_TSX.into()
+    };
+    ($name:ident) => {
+        $name::LANGUAGE.into()
+    };
 }
 
 macro_rules! implement_metric_trait {
@@ -66,7 +66,7 @@ macro_rules! implement_metric_trait {
 macro_rules! mk_lang {
     ( $( ($camel:ident, $name:ident, $display: expr, $description:expr) ),* ) => {
         /// The list of supported languages.
-        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
         pub enum LANG {
             $(
                 #[doc = $description]

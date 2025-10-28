@@ -77,6 +77,9 @@ pub use crate::function::*;
 mod ast;
 pub use crate::ast::*;
 
+mod analysis_context;
+pub(crate) use analysis_context::*;
+
 mod count;
 pub use crate::count::*;
 
@@ -97,6 +100,9 @@ pub use crate::traits::*;
 
 mod parser;
 pub use crate::parser::*;
+
+mod parser_registry;
+pub use crate::parser_registry::*;
 
 mod comment_rm;
 pub use crate::comment_rm::*;
