@@ -1,18 +1,19 @@
 // Debug tool to inspect Python AST structure for boolean operators
 use singularity_code_analysis::*;
+use tree_sitter::Tree;
 
 fn main() {
     let code = "if a and b:\n    pass";
     println!("Code:\n{}\n", code);
 
-    let tree = node::Tree::new::<PythonParser>(code.as_bytes());
+    let tree = Tree::new::<PythonParser>(code.as_bytes());
     let root = tree.get_root();
 
     println!("AST Structure:");
     print_tree(&root, 0);
 }
 
-fn print_tree(node: &node::Node, depth: usize) {
+fn print_tree(node: &tree_sitter::Node, depth: usize) {
     let indent = "  ".repeat(depth);
     println!("{}[{:3}] {} ({})",
         indent,

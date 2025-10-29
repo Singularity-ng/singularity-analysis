@@ -1,5 +1,5 @@
 /// Inspects Elixir tree-sitter node types to help build proper language enum
-use tree_sitter::{Language, Parser};
+use tree_sitter::Parser;
 
 fn main() {
     let language = tree_sitter_elixir::LANGUAGE.into();

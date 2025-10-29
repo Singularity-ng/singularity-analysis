@@ -1,5 +1,5 @@
 /// Inspects Python tree-sitter node types to help understand the AST structure
-use tree_sitter::{Language, Parser};
+use tree_sitter::Parser;
 
 fn main() {
     let language = tree_sitter_python::LANGUAGE.into();
