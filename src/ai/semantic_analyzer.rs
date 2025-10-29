@@ -20,7 +20,7 @@ pub struct SemanticAnalyzer {
 }
 
 /// Code pattern representation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CodePattern {
     pub name: String,
     pub description: String,
@@ -369,7 +369,7 @@ impl SemanticAnalyzer {
     /// Add a code pattern to the analyzer
     pub fn add_pattern(&mut self, pattern: CodePattern) {
         let embedding = self.embed_code(&pattern.example);
-        let pattern_id = format!("{}_{}", pattern.language, pattern.name);
+        let pattern_id = format!("{:?}_{}", pattern.language, pattern.name);
         self.code_vectors.insert(pattern_id, embedding);
         
         self.language_patterns

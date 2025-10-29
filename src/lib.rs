@@ -62,6 +62,9 @@ pub use crate::node::*;
 mod metrics;
 pub use metrics::*;
 
+mod ai;
+pub use ai::*;
+
 mod languages;
 pub(crate) use languages::*;
 
