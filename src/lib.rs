@@ -1,10 +1,10 @@
-//! rust-code-analysis is a library to analyze and extract information
-//! from source codes written in many different programming languages.
+//! Singularity Code Analyzer is a library that analyzes and extracts information
+//! from source code written in many different programming languages.
 //!
 //! You can find the source code of this software on
-//! <a href="https://github.com/singularity/rust-code-analysis/" target="_blank">GitHub</a>,
+//! <a href="https://github.com/mikkihugo/singularity-code-analysis" target="_blank">GitHub</a>,
 //! while issues and feature requests can be posted on the respective
-//! <a href="https://github.com/singularity/rust-code-analysis/issues/" target="_blank">GitHub Issue Tracker</a>.
+//! <a href="https://github.com/mikkihugo/singularity-code-analysis/issues" target="_blank">GitHub issue tracker</a>.
 //!
 //! ## Supported Languages
 //!
@@ -115,6 +115,9 @@ pub use crate::parser::*;
 
 mod parser_registry;
 pub use crate::parser_registry::*;
+
+mod code_analyzer;
+pub use crate::code_analyzer::*;
 
 mod comment_rm;
 pub use crate::comment_rm::*;
