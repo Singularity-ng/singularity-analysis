@@ -1,0 +1,31 @@
+# Rust/Cargo
+/target/
+Cargo.lock
+**/*.rs.bk
+*.rlib
+*.rmeta
+
+# Build artifacts
+.cargo-build/
+.cargo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test artifacts
+.insta-pending/
+*.pending-snap
+insta-reviews/
+
+# Debug
+debug/
+*.dSYM/
+
+# OS
+.env.local
+.env.*.local
