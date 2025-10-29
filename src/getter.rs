@@ -3,9 +3,9 @@ use crate::{
     metrics::halstead::HalsteadType,
     spaces::SpaceKind,
     traits::Search,
-    CcommentCode, Cpp, CppCode, Elixir, ElixirCode, ErlangCode, GleamCode, Java,
-    JavaCode, Javascript, JavascriptCode, KotlinCode, LuaCode, Mozjs, MozjsCode, Node, PreprocCode,
-    Python, PythonCode, Rust, RustCode, Tsx, TsxCode, Typescript, TypescriptCode,
+    CcommentCode, Cpp, CppCode, Elixir, ElixirCode, ErlangCode, GleamCode, Java, JavaCode,
+    Javascript, JavascriptCode, KotlinCode, LuaCode, Mozjs, MozjsCode, Node, PreprocCode, Python,
+    PythonCode, Rust, RustCode, Tsx, TsxCode, Typescript, TypescriptCode,
 };
 
 macro_rules! get_operator {

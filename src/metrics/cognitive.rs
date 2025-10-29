@@ -483,7 +483,7 @@ impl Cognitive for JavaCode {
     ) {
         use Java::*;
 
-        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             IfStatement => {
@@ -548,9 +548,6 @@ impl Cognitive for ElixirCode {
                 lambda += 1;
                 stats.boolean_seq.reset();
             }
-            BinaryOp => {
-                stats.boolean_seq.reset();
-            }
             _ => {}
         }
 
@@ -566,7 +563,7 @@ impl Cognitive for ErlangCode {
     ) {
         use Erlang::*;
 
-        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             IfExpr | CaseExpr | ReceiveExpr | TryExpr | TryAfter => {

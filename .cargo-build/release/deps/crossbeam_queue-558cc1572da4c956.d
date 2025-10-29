@@ -1,0 +1,9 @@
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/crossbeam_queue-558cc1572da4c956.d: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/array_queue.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/seg_queue.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/libcrossbeam_queue-558cc1572da4c956.rlib: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/array_queue.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/seg_queue.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/libcrossbeam_queue-558cc1572da4c956.rmeta: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/array_queue.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/seg_queue.rs
+
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/lib.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/array_queue.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-queue-0.3.12/src/seg_queue.rs:

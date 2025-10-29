@@ -1,0 +1,10 @@
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/globset-f1e1172d34963df4.d: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/fnv.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/glob.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/pathutil.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/libglobset-f1e1172d34963df4.rlib: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/fnv.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/glob.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/pathutil.rs
+
+/home/mhugo/code/singularity/packages/singularity-code-analysis/.cargo-build/release/deps/libglobset-f1e1172d34963df4.rmeta: /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/lib.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/fnv.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/glob.rs /home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/pathutil.rs
+
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/lib.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/fnv.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/glob.rs:
+/home/mhugo/.cache/singularity/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/globset-0.4.16/src/pathutil.rs:

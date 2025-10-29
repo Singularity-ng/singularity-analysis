@@ -1,0 +1,79 @@
+# https://moonrepo.dev/schemas/project.json
+$schema: '../../.moon/cache/schemas/project.json'
+
+type: 'library'
+language: 'rust'
+project:
+  name: '@singularity/singularity-code-analysis'
+  description: 'Rust NIF for comprehensive code analysis with parser registry and metrics computation'
+  channel: '#internal'
+  owner: 'singularity'
+  maintainers: ['mikkihugo']
+
+tasks:
+  cargo-build:
+    command: 'cargo build --release'
+    inputs:
+      - 'src/**/*.rs'
+      - 'Cargo.toml'
+    outputs:
+      - 'target/release/'
+    options:
+      cache: true
+      runInCI: true
+
+  cargo-test:
+    command: 'cargo test --release'
+    deps:
+      - 'cargo-build'
+    inputs:
+      - 'src/**/*.rs'
+      - 'tests/**/*.rs'
+      - 'Cargo.toml'
+    options:
+      cache: true
+      runInCI: true
+
+  cargo-check:
+    command: 'cargo check'
+    inputs:
+      - 'src/**/*.rs'
+      - 'Cargo.toml'
+    options:
+      cache: true
+      runInCI: true
+
+  cargo-clippy:
+    command: 'cargo clippy --all-targets --all-features -- -D warnings'
+    deps:
+      - 'cargo-check'
+    inputs:
+      - 'src/**/*.rs'
+      - 'Cargo.toml'
+    options:
+      cache: true
+      runInCI: true
+
+  format:
+    command: 'cargo fmt --all'
+    inputs:
+      - 'src/**/*.rs'
+      - 'tests/**/*.rs'
+    options:
+      cache: false
+
+  lint:
+    command: 'cargo clippy --all-targets --all-features -- -D warnings'
+    deps:
+      - 'cargo-check'
+    inputs:
+      - 'src/**/*.rs'
+      - 'Cargo.toml'
+    options:
+      cache: false
+      runInCI: true
+
+  clean:
+    command: 'cargo clean'
+    options:
+      cache: false

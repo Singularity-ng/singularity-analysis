@@ -1,9 +1,10 @@
 use std::{collections::HashMap, path::Path, sync::Arc};
 
+use crate::traits::{LanguageInfo, ParserTrait};
 use crate::{
     abc::Abc, alterator::Alterator, checker::Checker, cognitive::Cognitive, cyclomatic::Cyclomatic,
     exit::Exit, getter::Getter, halstead::Halstead, langs::*, loc::Loc, mi::Mi, nargs::NArgs,
-    nom::Nom, npa::Npa, npm::Npm, parser::ParserTrait, preproc::PreprocResults, wmc::Wmc,
+    nom::Nom, npa::Npa, npm::Npm, preproc::PreprocResults, wmc::Wmc,
 };
 
 /// A registry for managing parsers for different programming languages.
@@ -31,6 +32,8 @@ impl ParserRegistry {
     pub fn register<T>(&mut self, language: LANG, factory: Box<dyn ParserFactory>)
     where
         T: 'static
+            + Send
+            + Sync
             + LanguageInfo
             + Alterator
             + Checker
@@ -64,8 +67,9 @@ impl ParserRegistry {
         path: &Path,
         pr: Option<Arc<PreprocResults>>,
     ) -> Result<Box<dyn std::any::Any>, Box<dyn std::error::Error>> {
-        self.parsers.get(language)
-            .ok_or_else(|| "Parser not found for language".into())?
+        self.parsers
+            .get(language)
+            .ok_or_else(|| Box::<dyn std::error::Error>::from("Parser not found for language"))?
             .create_parser(code, path, pr)
     }
 
@@ -108,6 +112,8 @@ impl ParserRegistry {
     fn register_parser<T>(&mut self, language: LANG)
     where
         T: 'static
+            + Send
+            + Sync
             + LanguageInfo
             + Alterator
             + Checker
@@ -199,7 +205,9 @@ impl<
             LANG::Javascript => vec!["js", "mjs", "jsx"],
             LANG::Java => vec!["java"],
             LANG::Rust => vec!["rs"],
-            LANG::Cpp => vec!["cpp", "cxx", "cc", "hxx", "hpp", "c", "h", "hh", "inc", "mm", "m"],
+            LANG::Cpp => vec![
+                "cpp", "cxx", "cc", "hxx", "hpp", "c", "h", "hh", "inc", "mm", "m",
+            ],
             LANG::Python => vec!["py"],
             LANG::Tsx => vec!["tsx"],
             LANG::Typescript => vec!["ts", "jsw", "jsmw"],
@@ -207,7 +215,6 @@ impl<
             LANG::Erlang => vec!["erl", "hrl"],
             LANG::Gleam => vec!["gleam"],
             LANG::Lua => vec!["lua"],
-            _ => vec![],
         }
     }
 
@@ -241,10 +248,16 @@ mod tests {
         let registry = ParserRegistry::with_builtins();
 
         let rust_path = PathBuf::from("test.rs");
-        assert_eq!(registry.detect_language_from_path(&rust_path), Some(LANG::Rust));
+        assert_eq!(
+            registry.detect_language_from_path(&rust_path),
+            Some(LANG::Rust)
+        );
 
         let elixir_path = PathBuf::from("test.ex");
-        assert_eq!(registry.detect_language_from_path(&elixir_path), Some(LANG::Elixir));
+        assert_eq!(
+            registry.detect_language_from_path(&elixir_path),
+            Some(LANG::Elixir)
+        );
 
         let unknown_path = PathBuf::from("test.unknown");
         assert_eq!(registry.detect_language_from_path(&unknown_path), None);

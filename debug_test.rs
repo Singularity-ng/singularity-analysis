@@ -1,38 +1,38 @@
-use std::path::Path;
-use singularity_code_analysis::{RustParser, metrics};
+use std::path::PathBuf;
+use singularity_code_analysis::*;
 
 fn main() {
-    let source = r#"fn f(a: bool, b: usize) {
-        if a {
-            return a;
-        }
-    }"#;
+    let source_code = "function f(a, b) {
+         return a * b;
+     }
+     function f1(a, b) {
+         return a * b;
+     }";
     
-    let path = Path::new("test.rs");
-    let parser = RustParser::new(source.as_bytes().to_vec(), &path, None);
+    let path = PathBuf::from("foo.js");
+    let source_as_vec = source_code.as_bytes().to_vec();
     
-    println!("Source code:");
-    println!("{}", source);
-    println!();
+    let parser = JavascriptParser::new(source_as_vec.clone(), &path, None);
+    let root = parser.get_root();
     
-    println!("Root node kind: {}", parser.get_root().kind());
-    println!("Root node has {} children", parser.get_root().child_count());
+    println!("Root node: {}", root.kind());
     
-    for i in 0..parser.get_root().child_count() {
-        if let Some(child) = parser.get_root().child(i) {
-            println!("Child {}: {} ({})", i, child.kind(), child.kind_id());
-        }
-    }
-    
-    println!();
-    println!("Metrics result:");
-    match metrics(&parser, &path) {
-        Some(func_space) => {
-            println!("Found {} spaces", func_space.spaces.len());
-            for space in &func_space.spaces {
-                println!("  Space: {} ({:?})", space.name.as_ref().unwrap_or(&"unnamed".to_string()), space.kind);
+    // Walk the tree and print all nodes
+    fn print_tree(node: &Node, depth: usize, code: &[u8]) {
+        let indent = "  ".repeat(depth);
+        let start = node.start_byte();
+        let end = node.end_byte();
+        let text = String::from_utf8_lossy(&code[start..end]);
+        let text_preview = if text.len() > 50 { format!("{}...", &text[..47]) } else { text.to_string() };
+        
+        println!("{}{} ({})", indent, node.kind(), text_preview);
+        
+        for i in 0..node.child_count() {
+            if let Some(child) = node.child(i) {
+                print_tree(&child, depth + 1, code);
             }
         }
-        None => println!("No function spaces found"),
     }
+    
+    print_tree(&root, 0, &source_as_vec);
 }
