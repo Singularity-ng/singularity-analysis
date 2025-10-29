@@ -385,7 +385,7 @@ impl Cognitive for CppCode {
         use Cpp::*;
 
         // TODO: Implement macros
-        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             IfStatement => {
@@ -483,7 +483,7 @@ impl Cognitive for JavaCode {
     ) {
         use Java::*;
 
-        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             IfStatement => {
@@ -521,7 +521,7 @@ impl Cognitive for ElixirCode {
     ) {
         use Elixir::*;
 
-        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             Call => {
@@ -563,7 +563,7 @@ impl Cognitive for ErlangCode {
     ) {
         use Erlang::*;
 
-        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             IfExpr | CaseExpr | ReceiveExpr | TryExpr | TryAfter => {
@@ -601,7 +601,7 @@ impl Cognitive for GleamCode {
     ) {
         use Gleam::*;
 
-        let (mut nesting, mut depth, mut lambda) = get_nesting_from_map(node, nesting_map);
+        let (mut nesting, depth, mut lambda) = get_nesting_from_map(node, nesting_map);
 
         match node.kind_id().into() {
             Case => {
