@@ -8,6 +8,7 @@ use crate::*;
 static AHO_CORASICK: OnceLock<AhoCorasick> = OnceLock::new();
 static RE: OnceLock<Regex> = OnceLock::new();
 
+#[allow(unused_macros)]
 macro_rules! check_if_func {
     ($parser: ident, $node: ident) => {
         $node.count_specific_ancestors::<$parser>(
