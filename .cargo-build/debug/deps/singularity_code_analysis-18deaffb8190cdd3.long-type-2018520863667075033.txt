@@ -1,1 +1,0 @@
-HashMap<langs::LANG, Box<(dyn parser_registry::ParserFactory + 'static)>>

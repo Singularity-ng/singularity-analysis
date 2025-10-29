@@ -755,3 +755,24 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+mod arrow_function_debug {
+    use super::*;
+    use crate::*;
+
+    #[test]
+    fn test_simple_arrow() {
+        check_metrics::<JavascriptParser>(
+            "const x = () => {};",
+            "test.js",
+            |metric| {
+                // Just check if any functions/closures are found
+                println!("Simple arrow: functions={}, closures={}, spaces={}", 
+                    metric.functions(), metric.closures(), metric.space_count);
+                assert!(metric.functions() > 0.0 || metric.closures() > 0.0 || metric.space_count > 1,
+                    "Arrow function not recognized at all");
+            },
+        );
+    }
+}

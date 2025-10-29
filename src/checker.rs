@@ -51,9 +51,11 @@ macro_rules! check_if_arrow_func {
 macro_rules! is_js_func {
     ($parser: ident, $node: ident) => {
         match $node.kind_id().into() {
-            FunctionDeclaration | MethodDefinition => true,
-            FunctionExpression => check_if_func!($parser, $node),
-            ArrowFunction => check_if_arrow_func!($parser, $node),
+            FunctionDeclaration | MethodDefinition | FunctionExpression => true,
+            ArrowFunction => {
+                // Arrow functions that are assigned to variables/properties are functions
+                check_if_arrow_func!($parser, $node)
+            },
             _ => false,
         }
     };
@@ -63,8 +65,10 @@ macro_rules! is_js_closure {
     ($parser: ident, $node: ident) => {
         match $node.kind_id().into() {
             GeneratorFunction | GeneratorFunctionDeclaration => true,
-            FunctionExpression => !check_if_func!($parser, $node),
-            ArrowFunction => !check_if_arrow_func!($parser, $node),
+            ArrowFunction => {
+                // Arrow functions used as expressions/callbacks are closures
+                !check_if_arrow_func!($parser, $node)
+            }
             _ => false,
         }
     };
