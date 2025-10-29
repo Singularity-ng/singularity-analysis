@@ -94,7 +94,6 @@ impl Alterator for CppCode {
 impl Alterator for PythonCode {}
 
 impl Alterator for JavaCode {}
-impl Alterator for KotlinCode {}
 
 // Singularity custom MozjsCode parser - delegate to standard JavascriptCode parser
 impl Alterator for MozjsCode {
@@ -199,3 +198,7 @@ impl Alterator for LuaCode {
         }
     }
 }
+
+impl Alterator for GoCode {}
+
+impl Alterator for CsharpCode {}

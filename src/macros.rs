@@ -288,7 +288,7 @@ macro_rules! mk_code {
             pub struct $code { _guard: (), }
 
             impl LanguageInfo for $code {
-                type BaseLang = $camel;
+                type BaseLang = LANG;
 
                 fn get_lang() -> LANG {
                     LANG::$camel

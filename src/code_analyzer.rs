@@ -112,9 +112,7 @@ impl SingularityCodeAnalyzer {
 
     /// Return the set of languages supported by the analyzer.
     pub fn supported_languages(&self) -> Vec<LANG> {
-        let mut langs = self.registry.supported_languages();
-        langs.sort_unstable();
-        langs
+        self.registry.supported_languages()
     }
 
     /// Attempt to map the provided language identifier to an internal [`LANG`].
@@ -123,6 +121,16 @@ impl SingularityCodeAnalyzer {
     /// and display names (`"rust"`).
     pub fn language_from_str(&self, value: &str) -> Option<LANG> {
         let normalized = value.trim().to_lowercase();
+        match normalized.as_str() {
+            "js" | "javascript" => return Some(LANG::Javascript),
+            "ts" | "typescript" => return Some(LANG::Typescript),
+            "tsx" => return Some(LANG::Tsx),
+            "golang" | "go" => return Some(LANG::Go),
+            "cs" | "csx" | "c#" | "csharp" => return Some(LANG::Csharp),
+            // "kt" | "kts" | "kotlin" => return Some(LANG::Kotlin),  // Kotlin temporarily disabled
+            _ => {}
+        }
+
         LANG::into_enum_iter().find(|lang| {
             lang.get_name() == normalized || format!("{:?}", lang).to_lowercase() == normalized
         })

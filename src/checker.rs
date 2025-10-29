@@ -959,3 +959,89 @@ impl Checker for LuaCode {
         )
     }
 }
+
+// Go language - delegate to Java as fallback
+impl Checker for GoCode {
+    fn is_comment(node: &Node) -> bool {
+        JavaCode::is_comment(node)
+    }
+
+    fn is_useful_comment(node: &Node, code: &[u8]) -> bool {
+        JavaCode::is_useful_comment(node, code)
+    }
+
+    fn is_func_space(node: &Node) -> bool {
+        JavaCode::is_func_space(node)
+    }
+
+    fn is_func(node: &Node) -> bool {
+        JavaCode::is_func(node)
+    }
+
+    fn is_closure(node: &Node) -> bool {
+        JavaCode::is_closure(node)
+    }
+
+    fn is_call(node: &Node) -> bool {
+        JavaCode::is_call(node)
+    }
+
+    fn is_non_arg(node: &Node) -> bool {
+        JavaCode::is_non_arg(node)
+    }
+
+    fn is_string(node: &Node) -> bool {
+        JavaCode::is_string(node)
+    }
+
+    fn is_else_if(node: &Node) -> bool {
+        JavaCode::is_else_if(node)
+    }
+
+    fn is_primitive(id: u16) -> bool {
+        JavaCode::is_primitive(id)
+    }
+}
+
+// C# language - delegate to Java as fallback
+impl Checker for CsharpCode {
+    fn is_comment(node: &Node) -> bool {
+        JavaCode::is_comment(node)
+    }
+
+    fn is_useful_comment(node: &Node, code: &[u8]) -> bool {
+        JavaCode::is_useful_comment(node, code)
+    }
+
+    fn is_func_space(node: &Node) -> bool {
+        JavaCode::is_func_space(node)
+    }
+
+    fn is_func(node: &Node) -> bool {
+        JavaCode::is_func(node)
+    }
+
+    fn is_closure(node: &Node) -> bool {
+        JavaCode::is_closure(node)
+    }
+
+    fn is_call(node: &Node) -> bool {
+        JavaCode::is_call(node)
+    }
+
+    fn is_non_arg(node: &Node) -> bool {
+        JavaCode::is_non_arg(node)
+    }
+
+    fn is_string(node: &Node) -> bool {
+        JavaCode::is_string(node)
+    }
+
+    fn is_else_if(node: &Node) -> bool {
+        JavaCode::is_else_if(node)
+    }
+
+    fn is_primitive(id: u16) -> bool {
+        JavaCode::is_primitive(id)
+    }
+}

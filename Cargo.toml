@@ -39,6 +39,9 @@ tree-sitter-erlang = { workspace = true }
 tree-sitter-gleam = { workspace = true }
 # Lua
 tree-sitter-lua = { workspace = true }
+# Go and C#
+tree-sitter-go = { workspace = true }
+tree-sitter-c-sharp = { workspace = true }
 num-traits = "0.2"
 
 # NIF support (optional - only when used from Elixir)

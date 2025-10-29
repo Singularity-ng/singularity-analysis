@@ -215,6 +215,8 @@ impl<
             LANG::Erlang => vec!["erl", "hrl"],
             LANG::Gleam => vec!["gleam"],
             LANG::Lua => vec!["lua"],
+            // Kotlin, Go, Csharp, C not yet fully implemented
+            _ => vec![],
         }
     }
 

@@ -357,7 +357,9 @@ implement_metric_trait!(
     ElixirCode,
     ErlangCode,
     GleamCode,
-    LuaCode
+    LuaCode,
+    GoCode,
+    CsharpCode
 );
 
 // Fitzpatrick, Jerry (1997). "Applying the ABC metric to C, C++ and Java". C++ Report.

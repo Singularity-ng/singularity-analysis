@@ -191,7 +191,9 @@ implement_metric_trait!(
     ElixirCode,
     ErlangCode,
     GleamCode,
-    LuaCode
+    LuaCode,
+    GoCode,
+    CsharpCode
 );
 
 #[cfg(test)]

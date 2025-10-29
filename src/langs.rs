@@ -150,6 +150,28 @@ mk_langs!(
         tree_sitter_lua,
         [lua],
         ["lua"]
+    ),
+    // Go language - Full metrics support
+    (
+        Go,
+        "The `Go` language (Golang)",
+        "go",
+        GoCode,
+        GoParser,
+        tree_sitter_go,
+        [go],
+        ["go"]
+    ),
+    // C# language - Full metrics support
+    (
+        Csharp,
+        "The `C#` language (CSharp)",
+        "c#",
+        CsharpCode,
+        CsharpParser,
+        tree_sitter_c_sharp,
+        [cs, csx],
+        ["csharp"]
     ) /* Singularity custom parsers removed - using standard tree-sitter parsers only
        * - Ccomment: Use standard C/C++ parser for comment analysis
        * - Preproc: Use standard C/C++ parser for macro analysis */
@@ -165,7 +187,7 @@ pub struct KotlinCode;
 pub type MozjsParser = JavascriptParser;
 pub type PreprocParser = CppParser;
 pub type CcommentParser = CppParser;
-pub type KotlinParser = JavaParser; // Use Java parser as fallback for Kotlin
+pub type KotlinParser = JavaParser;  // Use Java parser as fallback for Kotlin
 
 pub(crate) mod fake {
     pub(crate) fn get_true<'a>(ext: &str, mode: &str) -> Option<&'a str> {

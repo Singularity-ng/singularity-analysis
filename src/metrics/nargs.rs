@@ -230,6 +230,12 @@ impl NArgs for CppCode {
     }
 }
 
+// Go language - delegate to default impl
+impl NArgs for GoCode {}
+
+// C# language - delegate to default impl
+impl NArgs for CsharpCode {}
+
 implement_metric_trait!(
     [NArgs],
     ElixirCode,
