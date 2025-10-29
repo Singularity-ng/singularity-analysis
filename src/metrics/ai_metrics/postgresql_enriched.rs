@@ -793,8 +793,8 @@ impl PostgreSQLEnrichedAIMetrics {
         let mut features = Vec::new();
         
         // Nesting depth
-        let mut max_depth = 0;
-        let mut current_depth = 0;
+        let mut max_depth: i32 = 0;
+        let mut current_depth: i32 = 0;
         for ch in code.chars() {
             match ch {
                 '{' | '(' | '[' => {
@@ -878,7 +878,7 @@ impl PostgreSQLEnrichedAIMetrics {
     fn get_language_specific_patterns(&self, language: LANG) -> Vec<LanguagePattern> {
         match language {
             LANG::Rust => self.get_rust_patterns(),
-            LANG::JavaScript => self.get_javascript_patterns(),
+            LANG::Javascript => self.get_javascript_patterns(),
             LANG::Python => self.get_python_patterns(),
             LANG::Java => self.get_java_patterns(),
             LANG::Elixir => self.get_elixir_patterns(),
