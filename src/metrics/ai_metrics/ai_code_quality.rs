@@ -59,7 +59,7 @@ impl AICodeQualityStats {
     }
     
     fn analyze_readability(&self, code: &str) -> f64 {
-        let mut score = 100.0;
+        let mut score: f64 = 100.0;
         
         // Check for clear naming
         if self.has_clear_naming(code) {
@@ -76,11 +76,11 @@ impl AICodeQualityStats {
             score += 10.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_maintainability(&self, code: &str) -> f64 {
-        let mut score = 100.0;
+        let mut score: f64 = 100.0;
         
         // Check for modular structure
         if self.has_modular_structure(code) {
@@ -97,11 +97,11 @@ impl AICodeQualityStats {
             score += 15.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_performance(&self, code: &str) -> f64 {
-        let mut score = 100.0;
+        let mut score: f64 = 100.0;
         
         // Check for efficient algorithms
         if self.has_efficient_algorithms(code) {
@@ -113,11 +113,11 @@ impl AICodeQualityStats {
             score += 15.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_security(&self, code: &str) -> f64 {
-        let mut score = 100.0;
+        let mut score: f64 = 100.0;
         
         // Check for input validation
         if self.has_input_validation(code) {
@@ -129,7 +129,7 @@ impl AICodeQualityStats {
             score += 20.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn has_clear_naming(&self, code: &str) -> bool {

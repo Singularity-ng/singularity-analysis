@@ -12,4 +12,5 @@ pub mod npm;
 pub mod wmc;
 
 // AI/LLM-Powered Metrics for Best-in-Class Code Analysis
+#[cfg(feature = "ai-metrics")]
 pub mod ai_metrics;

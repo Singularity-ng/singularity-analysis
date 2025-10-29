@@ -59,7 +59,7 @@ impl TestabilityScoreStats {
     }
     
     fn analyze_modularity(&self, code: &str) -> f64 {
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Check for function/module structure
         if code.contains("fn ") || code.contains("def ") || code.contains("function ") {
@@ -84,11 +84,11 @@ impl TestabilityScoreStats {
             score += 25.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_dependency_injection(&self, code: &str) -> f64 {
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Check for constructor injection
         if code.contains("new ") || code.contains("::new") {
@@ -110,11 +110,11 @@ impl TestabilityScoreStats {
             score += 25.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_pure_functions(&self, code: &str) -> f64 {
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Check for functions without side effects
         if self.has_pure_functions(code) {
@@ -131,11 +131,11 @@ impl TestabilityScoreStats {
             score += 30.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn analyze_error_handling(&self, code: &str) -> f64 {
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Check for proper error handling
         if code.contains("try") || code.contains("catch") || code.contains("Result") || code.contains("Option") {
@@ -152,7 +152,7 @@ impl TestabilityScoreStats {
             score += 30.0;
         }
         
-        score.min(100.0)
+        score.min(100.0_f64)
     }
     
     fn has_single_responsibility(&self, code: &str) -> bool {
