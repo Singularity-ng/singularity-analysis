@@ -309,6 +309,35 @@ pub struct CodeLocation {
     pub column_end: usize,
 }
 
+/// Code features extracted from embedding
+#[derive(Debug, Clone)]
+pub struct CodeFeatures {
+    pub complexity: f32,
+    pub function_count: u32,
+    pub loop_count: u32,
+    pub condition_count: u32,
+    pub nesting_depth: u32,
+    pub comment_ratio: f32,
+    pub string_literal_count: u32,
+    pub keyword_scores: Vec<f32>,
+}
+
+/// Language-specific pattern template
+#[derive(Debug, Clone)]
+pub struct LanguagePattern {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub pattern_type: PatternType,
+    pub complexity_score: f64,
+    pub example: String,
+    pub usage_frequency: u32,
+    pub success_rate: f64,
+    pub last_updated: String,
+    pub tags: Vec<String>,
+    pub features: CodeFeatures,
+}
+
 impl Default for PostgreSQLEnrichedAIMetrics {
     fn default() -> Self {
         Self {
