@@ -216,6 +216,47 @@ pub fn operands_and_operators<'a, T: ParserTrait>(parser: &'a T, path: &'a Path)
 
     finalize::<T>(&mut state_stack, usize::MAX);
 
+    // If state_stack is empty (no functions found), create a global scope
+    if state_stack.is_empty() {
+        let mut root_state = State {
+            ops: Ops::new::<T::Getter>(&node, code, SpaceKind::Unit),
+            halstead_maps: HalsteadMaps::new(),
+            primitive_types: HashSet::new(),
+        };
+
+        // Traverse the entire tree for the global scope
+        let mut stack = vec![(node, 0)];
+        let mut children = Vec::new();
+        while let Some((n, _level)) = stack.pop() {
+            T::Halstead::compute(&n, code, &mut root_state.halstead_maps);
+            if T::Checker::is_primitive(n.kind_id()) {
+                let code_slice = &code[n.start_byte()..n.end_byte()];
+                let primitive_string = String::from_utf8(code_slice.to_vec())
+                    .unwrap_or_else(|_| String::from("primitive_type"));
+                root_state.primitive_types.insert(primitive_string);
+            }
+
+            let mut cursor = n.cursor();
+            if cursor.goto_first_child() {
+                loop {
+                    children.push(cursor.node());
+                    if !cursor.goto_next_sibling() {
+                        break;
+                    }
+                }
+                for child in children.drain(..).rev() {
+                    stack.push((child, 0));
+                }
+            }
+        }
+
+        // Compute operators and operands from halstead maps
+        compute_operators_and_operands::<T>(&mut root_state);
+
+        root_state.ops.name = path.to_str().map(|name| name.to_string());
+        return Some(root_state.ops);
+    }
+
     state_stack.pop().map(|mut state| {
         state.ops.name = path.to_str().map(|name| name.to_string());
         state.ops

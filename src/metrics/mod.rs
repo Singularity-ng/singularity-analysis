@@ -10,3 +10,6 @@ pub mod nom;
 pub mod npa;
 pub mod npm;
 pub mod wmc;
+
+// AI/LLM-Powered Metrics for Best-in-Class Code Analysis
+pub mod ai_metrics;

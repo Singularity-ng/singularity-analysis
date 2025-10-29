@@ -763,7 +763,6 @@ mod tests {
 #[cfg(test)]
 mod arrow_function_debug {
     use super::*;
-    use crate::*;
 
     #[test]
     fn test_simple_arrow() {
