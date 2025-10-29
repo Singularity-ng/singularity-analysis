@@ -29,49 +29,15 @@ macro_rules! check_if_func {
     };
 }
 
-macro_rules! check_if_arrow_func {
-    ($parser: ident, $node: ident) => {
-        $node.count_specific_ancestors::<$parser>(
-            |node| {
-                matches!(
-                    node.kind_id().into(),
-                    VariableDeclarator | AssignmentExpression | LabeledStatement
-                )
-            },
-            |node| {
-                matches!(
-                    node.kind_id().into(),
-                    StatementBlock | ReturnStatement | NewExpression | CallExpression
-                )
-            },
-        ) > 0
-            || $node.has_sibling(PropertyIdentifier as u16)
-    };
-}
-
 macro_rules! is_js_func {
     ($parser: ident, $node: ident) => {
-        match $node.kind_id().into() {
-            FunctionDeclaration | MethodDefinition | FunctionExpression => true,
-            ArrowFunction => {
-                // Arrow functions that are assigned to variables/properties are functions
-                check_if_arrow_func!($parser, $node)
-            },
-            _ => false,
-        }
+        matches!($node.kind(), "function_declaration" | "method_definition" | "function_expression")
     };
 }
 
 macro_rules! is_js_closure {
     ($parser: ident, $node: ident) => {
-        match $node.kind_id().into() {
-            GeneratorFunction | GeneratorFunctionDeclaration => true,
-            ArrowFunction => {
-                // Arrow functions used as expressions/callbacks are closures
-                !check_if_arrow_func!($parser, $node)
-            }
-            _ => false,
-        }
+        matches!($node.kind(), "arrow_function" | "generator_function" | "generator_function_declaration")
     };
 }
 
@@ -79,13 +45,11 @@ macro_rules! is_js_func_and_closure_checker {
     ($parser: ident, $language: ident) => {
         #[inline(always)]
         fn is_func(node: &Node) -> bool {
-            use $language::*;
             is_js_func!($parser, node)
         }
 
         #[inline(always)]
         fn is_closure(node: &Node) -> bool {
-            use $language::*;
             is_js_closure!($parser, node)
         }
     };

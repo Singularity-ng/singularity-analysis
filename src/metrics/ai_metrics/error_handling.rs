@@ -3,8 +3,6 @@
 //! Analyzes error declarations, unhandled exceptions, logging coverage, and fallback paths
 //! to predict runtime stability and debuggability.
 
-use std::collections::HashMap;
-
 /// Error Handling Metrics
 #[derive(Debug, Clone, PartialEq)]
 pub struct ErrorHandlingMetrics {
@@ -28,6 +26,17 @@ pub struct ErrorHandlingMetrics {
     pub log_statements: usize,
 }
 
+pub struct ErrorHandlingInputs {
+    pub error_type_coverage: f64,
+    pub unhandled_paths_ratio: f64,
+    pub specific_catches_ratio: f64,
+    pub logging_coverage: f64,
+    pub fallback_coverage: f64,
+    pub error_handlers: usize,
+    pub generic_catches: usize,
+    pub log_statements: usize,
+}
+
 impl ErrorHandlingMetrics {
     /// Calculate error handling score using weighted formula:
     /// Score = (
@@ -37,16 +46,18 @@ impl ErrorHandlingMetrics {
     ///   0.15 * logging_coverage +
     ///   0.1 * fallback_coverage
     /// ) * 100
-    pub fn calculate(
-        error_type_coverage: f64,
-        unhandled_paths_ratio: f64,
-        specific_catches_ratio: f64,
-        logging_coverage: f64,
-        fallback_coverage: f64,
-        error_handlers: usize,
-        generic_catches: usize,
-        log_statements: usize,
-    ) -> Self {
+    pub fn calculate(inputs: ErrorHandlingInputs) -> Self {
+        let ErrorHandlingInputs {
+            error_type_coverage,
+            unhandled_paths_ratio,
+            specific_catches_ratio,
+            logging_coverage,
+            fallback_coverage,
+            error_handlers,
+            generic_catches,
+            log_statements,
+        } = inputs;
+
         let error_handling_score = (
             0.3 * error_type_coverage +
             0.25 * (1.0 - unhandled_paths_ratio) +
@@ -56,12 +67,12 @@ impl ErrorHandlingMetrics {
         ) * 100.0;
 
         Self {
-            error_handling_score: error_handling_score.min(100.0).max(0.0),
-            error_type_coverage: (error_type_coverage * 100.0).min(100.0),
-            unhandled_paths_ratio: unhandled_paths_ratio.min(1.0),
-            specific_catches_ratio: (specific_catches_ratio * 100.0).min(100.0),
-            logging_coverage: (logging_coverage * 100.0).min(100.0),
-            fallback_path_coverage: (fallback_coverage * 100.0).min(100.0),
+            error_handling_score: error_handling_score.clamp(0.0, 100.0),
+            error_type_coverage: (error_type_coverage * 100.0).clamp(0.0, 100.0),
+            unhandled_paths_ratio: unhandled_paths_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: (specific_catches_ratio * 100.0).clamp(0.0, 100.0),
+            logging_coverage: (logging_coverage * 100.0).clamp(0.0, 100.0),
+            fallback_path_coverage: (fallback_coverage * 100.0).clamp(0.0, 100.0),
             error_handlers,
             generic_catches,
             log_statements,
@@ -103,16 +114,16 @@ impl ErrorHandlingMetrics {
 
         let fallback_coverage = question_marks as f64 / (error_handlers as f64 + 1.0);
 
-        Self::calculate(
-            (error_handlers as f64 / (error_handlers.max(1) as f64)).min(1.0),
-            unhandled_ratio.min(1.0),
-            specific_catches_ratio.min(1.0),
-            (log_statements as f64 / error_handlers.max(1) as f64).min(1.0),
-            fallback_coverage.min(1.0),
+        Self::calculate(ErrorHandlingInputs {
+            error_type_coverage: (error_handlers as f64 / error_handlers.max(1) as f64).clamp(0.0, 1.0),
+            unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: specific_catches_ratio.clamp(0.0, 1.0),
+            logging_coverage: (log_statements as f64 / error_handlers.max(1) as f64).clamp(0.0, 1.0),
+            fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
             error_handlers,
-            0, // Rust doesn't have generic catch blocks
+            generic_catches: 0,
             log_statements,
-        )
+        })
     }
 
     /// Analyze Python error handling (try/except, raise, Optional)
@@ -144,16 +155,16 @@ impl ErrorHandlingMetrics {
 
         let fallback_coverage = finally_blocks as f64 / (try_blocks.max(1) as f64);
 
-        Self::calculate(
+        Self::calculate(ErrorHandlingInputs {
             error_type_coverage,
-            unhandled_ratio.min(1.0),
-            specific_ratio,
-            (log_statements as f64 / try_blocks.max(1) as f64).min(1.0),
-            fallback_coverage.min(1.0),
-            except_blocks,
-            generic_excepts,
+            unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: specific_ratio.clamp(0.0, 1.0),
+            logging_coverage: (log_statements as f64 / try_blocks.max(1) as f64).clamp(0.0, 1.0),
+            fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
+            error_handlers: except_blocks,
+            generic_catches: generic_excepts,
             log_statements,
-        )
+        })
     }
 
     /// Analyze JavaScript/TypeScript error handling (try/catch, Promise, async/await)
@@ -179,16 +190,16 @@ impl ErrorHandlingMetrics {
 
         let fallback_coverage = finally_blocks as f64 / (try_blocks.max(1) as f64);
 
-        Self::calculate(
+        Self::calculate(ErrorHandlingInputs {
             error_type_coverage,
-            unhandled_ratio.min(1.0),
-            specific_ratio,
-            (log_statements as f64 / try_blocks.max(1) as f64).min(1.0),
-            fallback_coverage.min(1.0),
-            catch_blocks,
+            unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: specific_ratio,
+            logging_coverage: (log_statements as f64 / try_blocks.max(1) as f64).clamp(0.0, 1.0),
+            fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
+            error_handlers: catch_blocks,
             generic_catches,
             log_statements,
-        )
+        })
     }
 
     /// Analyze Java error handling (try/catch, throws, Optional)
@@ -214,16 +225,16 @@ impl ErrorHandlingMetrics {
 
         let fallback_coverage = finally_blocks as f64 / (try_blocks.max(1) as f64);
 
-        Self::calculate(
+        Self::calculate(ErrorHandlingInputs {
             error_type_coverage,
-            unhandled_ratio.min(1.0),
-            specific_ratio,
-            (log_statements as f64 / try_blocks.max(1) as f64).min(1.0),
-            fallback_coverage.min(1.0),
-            catch_blocks,
+            unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: specific_ratio,
+            logging_coverage: (log_statements as f64 / try_blocks.max(1) as f64).clamp(0.0, 1.0),
+            fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
+            error_handlers: catch_blocks,
             generic_catches,
             log_statements,
-        )
+        })
     }
 
     /// Fallback generic error analysis
@@ -234,16 +245,22 @@ impl ErrorHandlingMetrics {
 
         let log_statements = code.matches("log").count() + code.matches("error").count();
 
-        Self::calculate(
-            if try_like == 0 { 0.5 } else { (catch_like as f64) / (try_like as f64) }.min(1.0),
-            0.3,
-            0.5,
-            (log_statements as f64 / 100.0).min(1.0),
-            0.3,
-            error_keywords,
-            0,
+        let error_type_coverage = if try_like == 0 {
+            0.5
+        } else {
+            (catch_like as f64 / try_like as f64).clamp(0.0, 1.0)
+        };
+
+        Self::calculate(ErrorHandlingInputs {
+            error_type_coverage,
+            unhandled_paths_ratio: 0.3,
+            specific_catches_ratio: 0.5,
+            logging_coverage: (log_statements as f64 / 100.0).clamp(0.0, 1.0),
+            fallback_coverage: 0.3,
+            error_handlers: error_keywords,
+            generic_catches: 0,
             log_statements,
-        )
+        })
     }
 }
 
@@ -321,16 +338,16 @@ mod tests {
 
     #[test]
     fn test_calculate_formula() {
-        let metrics = ErrorHandlingMetrics::calculate(
-            0.8,  // error_type_coverage
-            0.1,  // unhandled_paths_ratio
-            0.7,  // specific_catches_ratio
-            0.6,  // logging_coverage
-            0.5,  // fallback_coverage
-            10,
-            1,
-            5,
-        );
+        let metrics = ErrorHandlingMetrics::calculate(ErrorHandlingInputs {
+            error_type_coverage: 0.8,
+            unhandled_paths_ratio: 0.1,
+            specific_catches_ratio: 0.7,
+            logging_coverage: 0.6,
+            fallback_coverage: 0.5,
+            error_handlers: 10,
+            generic_catches: 1,
+            log_statements: 5,
+        });
 
         // Expected: 0.3*0.8 + 0.25*(1-0.1) + 0.2*0.7 + 0.15*0.6 + 0.1*0.5
         // = 0.24 + 0.225 + 0.14 + 0.09 + 0.05 = 0.745 * 100 = 74.5

@@ -362,7 +362,7 @@ pub(crate) fn guess_file<S: ::std::hash::BuildHasher>(
             }
         }
 
-        let path_min: Vec<_> = path_min.drain(..).map(|p| p.to_path_buf()).collect();
+        let path_min: Vec<_> = path_min.into_iter().map(|p| p.to_path_buf()).collect();
         return path_min;
     }
 

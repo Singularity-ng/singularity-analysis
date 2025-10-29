@@ -87,7 +87,7 @@ where
 
     let mut all_files: HashMap<String, Vec<PathBuf>> = HashMap::new();
 
-    for path in paths.drain(..) {
+    for path in std::mem::take(&mut paths) {
         if !path.exists() {
             eprintln!("Warning: File doesn't exist: {path:?}");
             continue;

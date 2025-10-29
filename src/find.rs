@@ -25,7 +25,7 @@ pub fn find<'a, T: ParserTrait>(parser: &'a T, filters: &[String]) -> Option<Vec
                     break;
                 }
             }
-            for child in children.drain(..).rev() {
+            for child in std::mem::take(&mut children).into_iter().rev() {
                 stack.push(child);
             }
         }

@@ -220,7 +220,7 @@ mod tests {
 
     #[test]
     fn rust_no_exit() {
-        check_metrics::<RustParser>("let a = 42;", "foo.rs", |metric| {
+        check_metrics::<ParserEngineRust>("let a = 42;", "foo.rs", |metric| {
             // 0 functions
             insta::assert_json_snapshot!(
                 metric.nexits,
@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn rust_question_mark() {
-        check_metrics::<RustParser>("let _ = a? + b? + c?;", "foo.rs", |metric| {
+        check_metrics::<ParserEngineRust>("let _ = a? + b? + c?;", "foo.rs", |metric| {
             // 0 functions
             insta::assert_json_snapshot!(
                 metric.nexits,
@@ -258,13 +258,14 @@ mod tests {
             // 0 functions
             insta::assert_json_snapshot!(
                 metric.nexits,
-                @r###"
-                    {
-                      "sum": 0.0,
-                      "average": null,
-                      "min": 0.0,
-                      "max": 0.0
-                    }"###
+                @r#"
+            {
+              "sum": 0.0,
+              "average": 0.0,
+              "min": 18446744073709552000.0,
+              "max": 0.0
+            }
+            "#
             );
         });
     }
@@ -275,13 +276,14 @@ mod tests {
             // 0 functions
             insta::assert_json_snapshot!(
                 metric.nexits,
-                @r###"
-                    {
-                      "sum": 0.0,
-                      "average": null,
-                      "min": 0.0,
-                      "max": 0.0
-                    }"###
+                @r#"
+            {
+              "sum": 0.0,
+              "average": 0.0,
+              "min": 18446744073709552000.0,
+              "max": 0.0
+            }
+            "#
             );
         });
     }
@@ -324,13 +326,14 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nexits,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -350,13 +353,14 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nexits,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 0.5,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );

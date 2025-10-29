@@ -48,7 +48,7 @@ pub use language_rust::*;
     "The `Rust` language",
     "rust",
     RustCode,
-    RustParser,
+    ParserEngineRust,
     tree_sitter_rust,
     [rs],
     ["rust"]

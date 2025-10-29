@@ -66,6 +66,7 @@ impl AnalyzerResult {
 
 /// Options for running the analyzer over in-memory content.
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct AnalyzeOptions<'a> {
     /// Optional virtual path to associate with the content.
     pub virtual_path: Option<&'a Path>,
@@ -73,14 +74,6 @@ pub struct AnalyzeOptions<'a> {
     pub preprocessor: Option<Arc<PreprocResults>>,
 }
 
-impl<'a> Default for AnalyzeOptions<'a> {
-    fn default() -> Self {
-        Self {
-            virtual_path: None,
-            preprocessor: None,
-        }
-    }
-}
 
 /// High-level façade for running Singularity's multi-language metrics engine.
 ///

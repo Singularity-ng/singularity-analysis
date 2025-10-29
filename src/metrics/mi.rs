@@ -45,7 +45,7 @@ impl fmt::Display for Stats {
 }
 
 impl Stats {
-    pub(crate) fn merge(&mut self, _other: &Stats) {}
+    pub(crate) fn merge(&self, _other: &Stats) {}
 
     /// Returns the `Mi` metric calculated using the original formula.
     ///

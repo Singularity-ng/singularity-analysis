@@ -130,13 +130,14 @@ pub fn fix_includes<S: ::std::hash::BuildHasher>(
             }
 
             let replacement = g.add_node(PathBuf::from(""));
-            for i in incoming.drain(..) {
+            for i in incoming {
                 g.add_edge(i, replacement, 0);
             }
-            for o in outgoing.drain(..) {
+            for o in outgoing {
                 g.add_edge(replacement, o, 0);
             }
-            for c in component.drain(..) {
+            let component_nodes: Vec<_> = component.to_vec();
+            for c in component_nodes {
                 let path = g.remove_node(c).unwrap();
                 paths.insert(path.to_str().unwrap().to_string());
                 *nodes.get_mut(&path).unwrap() = replacement;

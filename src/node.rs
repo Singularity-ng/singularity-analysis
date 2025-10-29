@@ -81,6 +81,7 @@ impl<'a> Node<'a> {
     }
 
     #[inline(always)]
+    #[allow(dead_code)]
     pub(crate) fn has_sibling(&self, id: u16) -> bool {
         self.0.parent().is_some_and(|parent| {
             self.0
@@ -225,7 +226,7 @@ impl<'a> Search<'a> for Node<'a> {
                         break;
                     }
                 }
-                for child in children.drain(..).rev() {
+                for child in std::mem::take(&mut children).into_iter().rev() {
                     stack.push(child);
                 }
             }
@@ -251,7 +252,7 @@ impl<'a> Search<'a> for Node<'a> {
                         break;
                     }
                 }
-                for child in children.drain(..).rev() {
+                for child in std::mem::take(&mut children).into_iter().rev() {
                     stack.push(child);
                 }
             }

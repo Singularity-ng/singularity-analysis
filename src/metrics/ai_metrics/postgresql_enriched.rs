@@ -25,7 +25,7 @@ use crate::langs::LANG;
 use std::collections::HashMap;
 
 /// PostgreSQL-enriched AI metrics that leverage vector search and relational data
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PostgreSQLEnrichedAIMetrics {
     /// Semantic complexity with database patterns
     pub semantic_complexity: PostgreSQLSemanticComplexity,
@@ -353,18 +353,6 @@ pub struct LanguagePattern {
     pub last_updated: String,
     pub tags: Vec<String>,
     pub features: CodeFeatures,
-}
-
-impl Default for PostgreSQLEnrichedAIMetrics {
-    fn default() -> Self {
-        Self {
-            semantic_complexity: PostgreSQLSemanticComplexity::default(),
-            refactoring_readiness: PostgreSQLRefactoringReadiness::default(),
-            ai_code_quality: PostgreSQLAICodeQuality::default(),
-            code_smell_density: PostgreSQLCodeSmellDensity::default(),
-            testability_score: PostgreSQLTestabilityScore::default(),
-        }
-    }
 }
 
 impl Default for PostgreSQLSemanticComplexity {

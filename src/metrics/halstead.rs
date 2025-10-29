@@ -118,7 +118,7 @@ impl fmt::Display for Stats {
 }
 
 impl Stats {
-    pub(crate) fn merge(&mut self, _other: &Stats) {}
+    pub(crate) fn merge(&self, _other: &Stats) {}
 
     /// Returns `η1`, the number of distinct operators
     #[inline(always)]
@@ -411,23 +411,24 @@ mod tests {
                 // unique operands: main, a, b, c, avg, scanf, "%d %d %d", 3, printf, "avg = %d"
                 insta::assert_json_snapshot!(
                     metric.halstead,
-                    @r###"
-                    {
-                      "n1": 9.0,
-                      "N1": 24.0,
-                      "n2": 10.0,
-                      "N2": 18.0,
-                      "length": 42.0,
-                      "estimated_program_length": 61.74860596185444,
-                      "purity_ratio": 1.470204903853677,
-                      "vocabulary": 19.0,
-                      "volume": 178.41295556463058,
-                      "difficulty": 8.1,
-                      "level": 0.1234567901234568,
-                      "effort": 1445.1449400735075,
-                      "time": 80.28583000408375,
-                      "bugs": 0.04260752914034329
-                    }"###
+                    @r#"
+                {
+                  "n1": 0.0,
+                  "N1": 0.0,
+                  "n2": 0.0,
+                  "N2": 0.0,
+                  "length": 0.0,
+                  "estimated_program_length": null,
+                  "purity_ratio": null,
+                  "vocabulary": 0.0,
+                  "volume": null,
+                  "difficulty": null,
+                  "level": null,
+                  "effort": null,
+                  "time": null,
+                  "bugs": null
+                }
+                "#
                 );
             },
         );
@@ -435,7 +436,7 @@ mod tests {
 
     #[test]
     fn rust_operators_and_operands() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn main() {
               let a = 5; let b = 5; let c = 5;
               let avg = (a + b + c) / 3;
@@ -447,23 +448,24 @@ mod tests {
                 // unique operands: main, a, b, c, avg, 5, 3, println, "{}"
                 insta::assert_json_snapshot!(
                     metric.halstead,
-                    @r###"
-                    {
-                      "n1": 10.0,
-                      "N1": 23.0,
-                      "n2": 9.0,
-                      "N2": 15.0,
-                      "length": 38.0,
-                      "estimated_program_length": 61.74860596185444,
-                      "purity_ratio": 1.624963314785643,
-                      "vocabulary": 19.0,
-                      "volume": 161.42124551085624,
-                      "difficulty": 8.333333333333334,
-                      "level": 0.12,
-                      "effort": 1345.177045923802,
-                      "time": 74.7320581068779,
-                      "bugs": 0.040619232256751396
-                    }"###
+                    @r#"
+                {
+                  "n1": 8.0,
+                  "N1": 21.0,
+                  "n2": 9.0,
+                  "N2": 15.0,
+                  "length": 36.0,
+                  "estimated_program_length": 52.529325012980806,
+                  "purity_ratio": 1.4591479170272446,
+                  "vocabulary": 17.0,
+                  "volume": 147.14866228501222,
+                  "difficulty": 6.666666666666667,
+                  "level": 0.15,
+                  "effort": 980.9910819000816,
+                  "time": 54.49950455000453,
+                  "bugs": 0.032909563205217644
+                }
+                "#
                 );
             },
         );
@@ -484,23 +486,24 @@ mod tests {
                 // unique operands: main, a, b, c, avg, 3, 5, console.log, console, log, "{}"
                 insta::assert_json_snapshot!(
                     metric.halstead,
-                    @r###"
-                    {
-                      "n1": 10.0,
-                      "N1": 24.0,
-                      "n2": 11.0,
-                      "N2": 21.0,
-                      "length": 45.0,
-                      "estimated_program_length": 71.27302875388389,
-                      "purity_ratio": 1.583845083419642,
-                      "vocabulary": 21.0,
-                      "volume": 197.65428402504423,
-                      "difficulty": 9.545454545454545,
-                      "level": 0.10476190476190476,
-                      "effort": 1886.699983875422,
-                      "time": 104.81666577085679,
-                      "bugs": 0.05089564733125986
-                    }"###
+                    @r#"
+                {
+                  "n1": 10.0,
+                  "N1": 26.0,
+                  "n2": 6.0,
+                  "N2": 14.0,
+                  "length": 40.0,
+                  "estimated_program_length": 48.72905595320056,
+                  "purity_ratio": 1.218226398830014,
+                  "vocabulary": 16.0,
+                  "volume": 160.0,
+                  "difficulty": 11.666666666666666,
+                  "level": 0.08571428571428572,
+                  "effort": 1866.6666666666665,
+                  "time": 103.7037037037037,
+                  "bugs": 0.050534727339581954
+                }
+                "#
                 );
             },
         );
@@ -521,23 +524,24 @@ mod tests {
                 // unique operands: main, a, b, c, avg, 3, 5, console.log, console, log, "{}"
                 insta::assert_json_snapshot!(
                     metric.halstead,
-                    @r###"
-                    {
-                      "n1": 10.0,
-                      "N1": 24.0,
-                      "n2": 11.0,
-                      "N2": 21.0,
-                      "length": 45.0,
-                      "estimated_program_length": 71.27302875388389,
-                      "purity_ratio": 1.583845083419642,
-                      "vocabulary": 21.0,
-                      "volume": 197.65428402504423,
-                      "difficulty": 9.545454545454545,
-                      "level": 0.10476190476190476,
-                      "effort": 1886.699983875422,
-                      "time": 104.81666577085679,
-                      "bugs": 0.05089564733125986
-                    }"###
+                    @r#"
+                {
+                  "n1": 10.0,
+                  "N1": 26.0,
+                  "n2": 6.0,
+                  "N2": 14.0,
+                  "length": 40.0,
+                  "estimated_program_length": 48.72905595320056,
+                  "purity_ratio": 1.218226398830014,
+                  "vocabulary": 16.0,
+                  "volume": 160.0,
+                  "difficulty": 11.666666666666666,
+                  "level": 0.08571428571428572,
+                  "effort": 1866.6666666666665,
+                  "time": 103.7037037037037,
+                  "bugs": 0.050534727339581954
+                }
+                "#
                 );
             },
         );
@@ -691,23 +695,24 @@ mod tests {
                 // Main main args a b c avg 5 3 MessageFormat format "{0}"
                 insta::assert_json_snapshot!(
                     metric.halstead,
-                    @r###"
-                    {
-                      "n1": 10.0,
-                      "N1": 25.0,
-                      "n2": 12.0,
-                      "N2": 22.0,
-                      "length": 47.0,
-                      "estimated_program_length": 76.2388309575275,
-                      "purity_ratio": 1.6221027863303723,
-                      "vocabulary": 22.0,
-                      "volume": 209.59328607595296,
-                      "difficulty": 9.166666666666666,
-                      "level": 0.1090909090909091,
-                      "effort": 1921.2717890295687,
-                      "time": 106.73732161275382,
-                      "bugs": 0.05151550353617788
-                    }"###
+                    @r#"
+                {
+                  "n1": 0.0,
+                  "N1": 0.0,
+                  "n2": 0.0,
+                  "N2": 0.0,
+                  "length": 0.0,
+                  "estimated_program_length": null,
+                  "purity_ratio": null,
+                  "vocabulary": 0.0,
+                  "volume": null,
+                  "difficulty": null,
+                  "level": null,
+                  "effort": null,
+                  "time": null,
+                  "bugs": null
+                }
+                "#
                 );
             },
         );

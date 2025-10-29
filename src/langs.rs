@@ -64,7 +64,7 @@ mk_langs!(
         "The `Rust` language",
         "rust",
         RustCode,
-        RustParser,
+        ParserEngineRust,
         tree_sitter_rust,
         [rs],
         ["rust"]

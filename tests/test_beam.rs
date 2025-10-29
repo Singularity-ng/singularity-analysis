@@ -30,12 +30,12 @@ pub fn hello(name: String) -> String {
     match get_function_spaces(
         &LANG::Elixir,
         elixir_code.as_bytes().to_vec(),
-        &path_ex,
+        path_ex,
         None,
     ) {
         Some(func_space) => {
             println!("Success! Found {} spaces", func_space.spaces.len());
-            assert!(func_space.spaces.len() > 0);
+            assert!(!func_space.spaces.is_empty());
         }
         None => println!("No function spaces found for Elixir"),
     }
@@ -45,12 +45,12 @@ pub fn hello(name: String) -> String {
     match get_function_spaces(
         &LANG::Erlang,
         erlang_code.as_bytes().to_vec(),
-        &path_erl,
+        path_erl,
         None,
     ) {
         Some(func_space) => {
             println!("Success! Found {} spaces", func_space.spaces.len());
-            assert!(func_space.spaces.len() > 0);
+            assert!(!func_space.spaces.is_empty());
         }
         None => println!("No function spaces found for Erlang"),
     }
@@ -60,12 +60,12 @@ pub fn hello(name: String) -> String {
     match get_function_spaces(
         &LANG::Gleam,
         gleam_code.as_bytes().to_vec(),
-        &path_gleam,
+        path_gleam,
         None,
     ) {
         Some(func_space) => {
             println!("Success! Found {} spaces", func_space.spaces.len());
-            assert!(func_space.spaces.len() > 0);
+            assert!(!func_space.spaces.is_empty());
         }
         None => println!("No function spaces found for Gleam"),
     }

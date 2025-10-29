@@ -345,7 +345,7 @@ pub fn metrics<'a, T: ParserTrait>(parser: &'a T, path: &'a Path) -> Option<Func
                     break;
                 }
             }
-            for child in children.drain(..).rev() {
+            for child in std::mem::take(&mut children).into_iter().rev() {
                 stack.push(child);
             }
         }

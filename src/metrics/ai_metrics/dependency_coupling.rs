@@ -44,14 +44,14 @@ impl DependencyCouplingMetrics {
         cycles: Vec<Vec<String>>,
         import_graph: HashMap<String, Vec<String>>,
     ) -> Self {
-        let density_penalty = (import_density / 10.0).min(1.0) * 10.0 * 0.3;
+        let density_penalty = (import_density / 10.0).clamp(0.0, 1.0) * 10.0 * 0.3;
         let cyclic_penalty = (cyclic_count as f64) * 0.25;
-        let depth_penalty = (max_depth as f64 / 5.0).min(1.0) * 20.0 * 0.2;
+        let depth_penalty = (max_depth as f64 / 5.0).clamp(0.0, 1.0) * 20.0 * 0.2;
         let violation_penalty = (violations as f64) * 0.15;
-        let external_penalty = external_ratio.min(1.0) * 10.0 * 0.1;
+        let external_penalty = external_ratio.clamp(0.0, 1.0) * 10.0 * 0.1;
 
         let total_penalty = density_penalty + cyclic_penalty + depth_penalty + violation_penalty + external_penalty;
-        let coupling_score = (100.0 - total_penalty).max(0.0).min(100.0);
+        let coupling_score = (100.0 - total_penalty).clamp(0.0, 100.0);
 
         Self {
             coupling_score,
@@ -59,7 +59,7 @@ impl DependencyCouplingMetrics {
             cyclic_dependencies: cyclic_count,
             max_import_chain_depth: max_depth,
             layer_violations: violations,
-            external_import_ratio: external_ratio.min(1.0),
+            external_import_ratio: external_ratio.clamp(0.0, 1.0),
             cycles,
             import_graph,
         }
@@ -73,10 +73,7 @@ impl DependencyCouplingMetrics {
         for (from, to) in imports {
             all_modules.insert(from.clone());
             all_modules.insert(to.clone());
-            import_graph
-                .entry(from.clone())
-                .or_insert_with(Vec::new)
-                .push(to.clone());
+            import_graph.entry(from.clone()).or_default().push(to.clone());
         }
 
         let import_density = imports.len() as f64;

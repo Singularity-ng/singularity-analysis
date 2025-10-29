@@ -74,12 +74,12 @@ impl TypeSafetyMetrics {
         );
 
         Self {
-            type_safety_score: type_safety_score.min(100.0).max(0.0),
-            annotation_coverage: (annotation_coverage * 100.0).min(100.0),
-            generic_usage_score: (generic_usage * 100.0).min(100.0),
-            unsafe_ratio,
-            explicit_type_ratio: (explicit_type_ratio * 100.0).min(100.0),
-            pattern_matching_score: (pattern_matching * 100.0).min(100.0),
+            type_safety_score: type_safety_score.clamp(0.0, 100.0),
+            annotation_coverage: (annotation_coverage * 100.0).clamp(0.0, 100.0),
+            generic_usage_score: (generic_usage * 100.0).clamp(0.0, 100.0),
+            unsafe_ratio: unsafe_ratio.clamp(0.0, 1.0),
+            explicit_type_ratio: (explicit_type_ratio * 100.0).clamp(0.0, 100.0),
+            pattern_matching_score: (pattern_matching * 100.0).clamp(0.0, 100.0),
             language_scores,
         }
     }
@@ -87,35 +87,21 @@ impl TypeSafetyMetrics {
 
 /// Analyze type safety for Rust code
 pub fn analyze_rust_type_safety(code: &str) -> TypeSafetyMetrics {
-    let mut annotation_coverage = 0.0;
-    let mut generic_usage = 0.0;
-    let mut unsafe_count = 0;
-    let mut explicit_types = 0;
-    let mut pattern_matches = 0;
-    let mut total_declarations = 1; // Avoid division by zero
+    let annotation_count = code.matches(": ").count();
+    let annotation_coverage = if annotation_count > 0 { 0.8 } else { 0.0 };
+    let explicit_types = annotation_count;
 
-    // Count type annotations
-    if code.contains(": ") {
-        annotation_coverage = 0.8;
-        explicit_types = code.matches(": ").count();
-    }
+    let generic_usage = code.matches('<').count().min(10) as f64 / 10.0;
 
-    // Count generics usage
-    if code.contains('<') && code.contains('>') {
-        generic_usage = code.matches('<').count().min(10) as f64 / 10.0;
-    }
+    let line_count = code.lines().count().max(1) as f64;
+    let unsafe_blocks = code.matches("unsafe {").count();
+    let unsafe_ratio = (unsafe_blocks as f64 / line_count).clamp(0.0, 1.0);
 
-    // Count unsafe blocks
-    unsafe_count = code.matches("unsafe {").count();
-    let unsafe_ratio = (unsafe_count as f64 / (1.0 + code.lines().count() as f64)).min(1.0);
+    let total_declarations = code.matches("let ").count().max(1);
+    let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).clamp(0.0, 1.0);
 
-    // Count explicit type declarations
-    total_declarations = code.matches("let ").count().max(1);
-    let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).min(1.0);
-
-    // Count pattern matching
-    pattern_matches = code.matches("match ").count() + code.matches("if let ").count();
-    let pattern_matching_score = (pattern_matches as f64 / (1.0 + code.lines().count() as f64)).clamp(0.0, 1.0);
+    let pattern_matches = code.matches("match ").count() + code.matches("if let ").count();
+    let pattern_matching_score = (pattern_matches as f64 / line_count).clamp(0.0, 1.0);
 
     TypeSafetyMetrics::calculate(
         "rust",
@@ -129,31 +115,23 @@ pub fn analyze_rust_type_safety(code: &str) -> TypeSafetyMetrics {
 
 /// Analyze type safety for TypeScript code
 pub fn analyze_typescript_type_safety(code: &str) -> TypeSafetyMetrics {
-    let mut annotation_coverage = 0.0;
-    let mut generic_usage = 0.0;
-    let mut explicit_types = 0;
-    let mut pattern_matches = 0;
-    let mut total_declarations = 1;
-
-    // Count type annotations (: Type)
+    let line_count = code.lines().count().max(1) as f64;
     let annotation_count = code.matches(": ").count();
-    annotation_coverage = (annotation_count as f64 / (1.0 + code.lines().count() as f64)).min(1.0);
+    let annotation_coverage = (annotation_count as f64 / line_count).clamp(0.0, 1.0);
 
-    // Count generics
-    generic_usage = code.matches('<').count().min(10) as f64 / 10.0;
+    let generic_usage = code.matches('<').count().min(10) as f64 / 10.0;
 
-    // Count explicit type declarations
-    explicit_types = code.matches("as ").count() + annotation_count;
-    total_declarations = code.matches("let ").count()
-        + code.matches("const ").count()
-        + code.matches("var ").count();
-    total_declarations = total_declarations.max(1);
+    let explicit_types = code.matches("as ").count() + annotation_count;
+    let total_declarations = (
+        code.matches("let ").count()
+            + code.matches("const ").count()
+            + code.matches("var ").count()
+    )
+    .max(1);
+    let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).clamp(0.0, 1.0);
 
-    let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).min(1.0);
-
-    // Pattern matching (switch, if/else pattern)
-    pattern_matches = code.matches("switch ").count() + code.matches("as ").count();
-    let pattern_matching_score = (pattern_matches as f64 / (1.0 + code.lines().count() as f64)).clamp(0.0, 1.0);
+    let pattern_matches = code.matches("switch ").count() + code.matches("as ").count();
+    let pattern_matching_score = (pattern_matches as f64 / line_count).clamp(0.0, 1.0);
 
     // TypeScript has no unsafe, so that ratio is 0
     TypeSafetyMetrics::calculate(
@@ -168,29 +146,17 @@ pub fn analyze_typescript_type_safety(code: &str) -> TypeSafetyMetrics {
 
 /// Analyze type safety for Python code
 pub fn analyze_python_type_safety(code: &str) -> TypeSafetyMetrics {
-    let mut annotation_coverage = 0.0;
-    let mut generic_usage = 0.0;
-    let mut explicit_types = 0;
-    let mut pattern_matches = 0;
-    let mut total_declarations = 1;
-
-    // Count type hints (: Type)
+    let line_count = code.lines().count().max(1) as f64;
     let annotation_count = code.matches(": ").count();
-    annotation_coverage = (annotation_count as f64 / (1.0 + code.lines().count() as f64)).min(1.0);
+    let annotation_coverage = (annotation_count as f64 / line_count).clamp(0.0, 1.0);
 
-    // Count generics (typing.Generic, TypeVar)
-    generic_usage = (code.matches("Generic").count() + code.matches("TypeVar").count()) as f64 / 10.0;
+    let generic_usage = (code.matches("Generic").count() + code.matches("TypeVar").count()) as f64 / 10.0;
 
-    // Count explicit type declarations
-    explicit_types = annotation_count;
-    total_declarations = code.matches("def ").count() + code.matches("class ").count();
-    total_declarations = total_declarations.max(1);
+    let total_declarations = (code.matches("def ").count() + code.matches("class ").count()).max(1);
+    let explicit_type_ratio = (annotation_count as f64 / total_declarations as f64).clamp(0.0, 1.0);
 
-    let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).min(1.0);
-
-    // Pattern matching (match statements, if/elif)
-    pattern_matches = code.matches("match ").count();
-    let pattern_matching_score = (pattern_matches as f64 / (1.0 + code.lines().count() as f64)).clamp(0.0, 1.0);
+    let pattern_matches = code.matches("match ").count();
+    let pattern_matching_score = (pattern_matches as f64 / line_count).clamp(0.0, 1.0);
 
     // Python has no unsafe
     TypeSafetyMetrics::calculate(

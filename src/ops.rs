@@ -208,7 +208,7 @@ pub fn operands_and_operators<'a, T: ParserTrait>(parser: &'a T, path: &'a Path)
                     break;
                 }
             }
-            for child in children.drain(..).rev() {
+            for child in std::mem::take(&mut children).into_iter().rev() {
                 stack.push(child);
             }
         }
@@ -244,7 +244,7 @@ pub fn operands_and_operators<'a, T: ParserTrait>(parser: &'a T, path: &'a Path)
                         break;
                     }
                 }
-                for child in children.drain(..).rev() {
+                for child in std::mem::take(&mut children).into_iter().rev() {
                     stack.push((child, 0));
                 }
             }

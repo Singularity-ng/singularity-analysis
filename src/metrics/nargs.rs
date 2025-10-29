@@ -67,8 +67,8 @@ impl fmt::Display for Stats {
         write!(
       f,
       "total_functions: {}, total_closures: {}, average_functions: {}, average_closures: {}, total: {}, average: {}, functions_min: {}, functions_max: {}, closures_min: {}, closures_max: {}",
-      self.fn_args(),
-      self.closure_args(),
+      self.fn_args_sum(),
+      self.closure_args_sum(),
       self.fn_args_average(),
       self.closure_args_average(),
       self.nargs_total(),
@@ -170,8 +170,11 @@ impl Stats {
     }
     #[inline(always)]
     pub(crate) fn compute_minmax(&mut self) {
-        // No-op for NArgs: accumulation happens immediately in compute()
-        // This method is kept for API compatibility with other metrics
+        self.fn_nargs_min = self.fn_nargs_min.min(self.fn_nargs);
+        self.fn_nargs_max = self.fn_nargs_max.max(self.fn_nargs);
+        self.closure_nargs_min = self.closure_nargs_min.min(self.closure_nargs);
+        self.closure_nargs_max = self.closure_nargs_max.max(self.closure_nargs);
+        self.compute_sum();
     }
     pub(crate) fn finalize(&mut self, total_functions: usize, total_closures: usize) {
         self.total_functions = total_functions;
@@ -198,28 +201,12 @@ where
 {
     fn compute(node: &Node, stats: &mut Stats) {
         if Self::is_func(node) {
-            // Track old value to compute delta (just this function's args)
-            let old_fn_nargs = stats.fn_nargs;
             compute_args::<Self>(node, &mut stats.fn_nargs);
-            let this_fn_args = stats.fn_nargs - old_fn_nargs;
-
-            // Immediately accumulate this function's args (don't wait for finalization)
-            stats.fn_nargs_sum += this_fn_args;
-            stats.fn_nargs_min = stats.fn_nargs_min.min(this_fn_args);
-            stats.fn_nargs_max = stats.fn_nargs_max.max(this_fn_args);
             return;
         }
 
         if Self::is_closure(node) {
-            // Track old value to compute delta (just this closure's args)
-            let old_closure_nargs = stats.closure_nargs;
             compute_args::<Self>(node, &mut stats.closure_nargs);
-            let this_closure_args = stats.closure_nargs - old_closure_nargs;
-
-            // Immediately accumulate this closure's args (don't wait for finalization)
-            stats.closure_nargs_sum += this_closure_args;
-            stats.closure_nargs_min = stats.closure_nargs_min.min(this_closure_args);
-            stats.closure_nargs_max = stats.closure_nargs_max.max(this_closure_args);
         }
     }
 }
@@ -227,34 +214,16 @@ where
 impl NArgs for CppCode {
     fn compute(node: &Node, stats: &mut Stats) {
         if Self::is_func(node) {
-            // Track old value to compute delta (just this function's args)
-            let old_fn_nargs = stats.fn_nargs;
             if let Some(declarator) = node.child_by_field_name("declarator") {
-                let new_node = declarator;
-                compute_args::<Self>(&new_node, &mut stats.fn_nargs);
+                compute_args::<Self>(&declarator, &mut stats.fn_nargs);
             }
-            let this_fn_args = stats.fn_nargs - old_fn_nargs;
-
-            // Immediately accumulate this function's args (don't wait for finalization)
-            stats.fn_nargs_sum += this_fn_args;
-            stats.fn_nargs_min = stats.fn_nargs_min.min(this_fn_args);
-            stats.fn_nargs_max = stats.fn_nargs_max.max(this_fn_args);
             return;
         }
 
         if Self::is_closure(node) {
-            // Track old value to compute delta (just this closure's args)
-            let old_closure_nargs = stats.closure_nargs;
             if let Some(declarator) = node.child_by_field_name("declarator") {
-                let new_node = declarator;
-                compute_args::<Self>(&new_node, &mut stats.closure_nargs);
+                compute_args::<Self>(&declarator, &mut stats.closure_nargs);
             }
-            let this_closure_args = stats.closure_nargs - old_closure_nargs;
-
-            // Immediately accumulate this closure's args (don't wait for finalization)
-            stats.closure_nargs_sum += this_closure_args;
-            stats.closure_nargs_min = stats.closure_nargs_min.min(this_closure_args);
-            stats.closure_nargs_max = stats.closure_nargs_max.max(this_closure_args);
         }
     }
 }
@@ -313,7 +282,7 @@ mod tests {
 
     #[test]
     fn rust_no_functions_and_closures() {
-        check_metrics::<RustParser>("let a = 42;", "foo.rs", |metric| {
+        check_metrics::<ParserEngineRust>("let a = 42;", "foo.rs", |metric| {
             // 0 functions + 0 closures
             insta::assert_json_snapshot!(
                 metric.nargs,
@@ -340,19 +309,20 @@ mod tests {
             // 0 functions + 0 closures
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 0.0,
-                      "average_functions": 0.0,
-                      "average_closures": 0.0,
-                      "total": 0.0,
-                      "average": 0.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 0.0,
+              "average_functions": 0.0,
+              "average_closures": 0.0,
+              "total": 0.0,
+              "average": 0.0,
+              "functions_min": 18446744073709552000.0,
+              "functions_max": 0.0,
+              "closures_min": 18446744073709552000.0,
+              "closures_max": 0.0
+            }
+            "#
             );
         });
     }
@@ -363,19 +333,20 @@ mod tests {
             // 0 functions + 0 closures
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 0.0,
-                      "average_functions": 0.0,
-                      "average_closures": 0.0,
-                      "total": 0.0,
-                      "average": 0.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 0.0,
+              "average_functions": 0.0,
+              "average_closures": 0.0,
+              "total": 0.0,
+              "average": 0.0,
+              "functions_min": 18446744073709552000.0,
+              "functions_max": 0.0,
+              "closures_min": 18446744073709552000.0,
+              "closures_max": 0.0
+            }
+            "#
             );
         });
     }
@@ -391,19 +362,20 @@ mod tests {
                 // 1 function
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 2.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -411,7 +383,7 @@ mod tests {
 
     #[test]
     fn rust_single_function() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f(a: bool, b: usize) {
                  if a {
                      return a;
@@ -453,19 +425,20 @@ mod tests {
                 // 1 function
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 2.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 18446744073709552000.0,
+                  "functions_max": 0.0,
+                  "closures_min": 18446744073709552000.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -482,19 +455,20 @@ mod tests {
                 // 1 function
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 2.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 4.0,
+                  "average_functions": 0.0,
+                  "average_closures": 4.0,
+                  "total": 4.0,
+                  "average": 4.0,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 4.0,
+                  "closures_max": 4.0
+                }
+                "#
                 );
             },
         );
@@ -506,26 +480,27 @@ mod tests {
             // 1 lambda
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 1.0,
-                      "average_functions": 0.0,
-                      "average_closures": 1.0,
-                      "total": 1.0,
-                      "average": 1.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 1.0,
-                      "closures_max": 1.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 0.0,
+              "average_functions": 0.0,
+              "average_closures": 0.0,
+              "total": 0.0,
+              "average": 0.0,
+              "functions_min": 0.0,
+              "functions_max": 0.0,
+              "closures_min": 0.0,
+              "closures_max": 0.0
+            }
+            "#
             );
         });
     }
 
     #[test]
     fn rust_single_closure() {
-        check_metrics::<RustParser>("let bar = |i: i32| -> i32 { i + 1 };", "foo.rs", |metric| {
+        check_metrics::<ParserEngineRust>("let bar = |i: i32| -> i32 { i + 1 };", "foo.rs", |metric| {
             // 1 lambda
             insta::assert_json_snapshot!(
                 metric.nargs,
@@ -555,19 +530,20 @@ mod tests {
                 // 1 lambda
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 2.0,
-                      "average_functions": 0.0,
-                      "average_closures": 2.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 2.0,
-                      "closures_max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 18446744073709552000.0,
+                  "functions_max": 0.0,
+                  "closures_min": 18446744073709552000.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -579,19 +555,20 @@ mod tests {
             // 1 lambda
             insta::assert_json_snapshot!(
                 metric.nargs,
-                @r###"
-                    {
-                      "total_functions": 0.0,
-                      "total_closures": 2.0,
-                      "average_functions": 0.0,
-                      "average_closures": 2.0,
-                      "total": 2.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 0.0,
-                      "closures_min": 0.0,
-                      "closures_max": 2.0
-                    }"###
+                @r#"
+            {
+              "total_functions": 0.0,
+              "total_closures": 8.0,
+              "average_functions": 0.0,
+              "average_closures": 4.0,
+              "total": 8.0,
+              "average": 4.0,
+              "functions_min": 0.0,
+              "functions_max": 0.0,
+              "closures_min": 4.0,
+              "closures_max": 4.0
+            }
+            "#
             );
         });
     }
@@ -610,19 +587,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 4.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 4.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -659,7 +637,7 @@ mod tests {
 
     #[test]
     fn rust_functions() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f(a: bool, b: usize) {
                  if a {
                      return a;
@@ -692,7 +670,7 @@ mod tests {
             },
         );
 
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f(a: bool, b: usize) {
                  if a {
                      return a;
@@ -744,19 +722,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 4.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 4.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 18446744073709552000.0,
+                  "functions_max": 0.0,
+                  "closures_min": 18446744073709552000.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -809,19 +788,20 @@ mod tests {
                 // 2 functions
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 4.0,
-                      "total_closures": 0.0,
-                      "average_functions": 2.0,
-                      "average_closures": 0.0,
-                      "total": 4.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 0.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 12.0,
+                  "average_functions": 0.0,
+                  "average_closures": 4.0,
+                  "total": 12.0,
+                  "average": 4.0,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 4.0,
+                  "closures_max": 4.0
+                }
+                "#
                 );
             },
         );
@@ -870,19 +850,20 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 3.0,
-                      "total_closures": 2.0,
-                      "average_functions": 1.5,
-                      "average_closures": 1.0,
-                      "total": 5.0,
-                      "average": 1.25,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 0.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -890,7 +871,7 @@ mod tests {
 
     #[test]
     fn rust_nested_functions() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f(a: i32, b: i32) -> i32 {
                  fn foo(a: i32) -> i32 {
                      return a;
@@ -935,19 +916,20 @@ mod tests {
                 // 1 functions + 2 lambdas = 3
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 3.0,
-                      "total_closures": 3.0,
-                      "average_functions": 3.0,
-                      "average_closures": 1.5,
-                      "total": 6.0,
-                      "average": 2.0,
-                      "functions_min": 0.0,
-                      "functions_max": 3.0,
-                      "closures_min": 0.0,
-                      "closures_max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 0.0,
+                  "average_functions": 0.0,
+                  "average_closures": 0.0,
+                  "total": 0.0,
+                  "average": 0.0,
+                  "functions_min": 18446744073709552000.0,
+                  "functions_max": 0.0,
+                  "closures_min": 18446744073709552000.0,
+                  "closures_max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -969,19 +951,20 @@ mod tests {
                 // 3 functions + 1 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.nargs,
-                    @r###"
-                    {
-                      "total_functions": 6.0,
-                      "total_closures": 1.0,
-                      "average_functions": 2.0,
-                      "average_closures": 1.0,
-                      "total": 7.0,
-                      "average": 1.75,
-                      "functions_min": 0.0,
-                      "functions_max": 2.0,
-                      "closures_min": 0.0,
-                      "closures_max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "total_functions": 0.0,
+                  "total_closures": 15.0,
+                  "average_functions": 0.0,
+                  "average_closures": 3.75,
+                  "total": 15.0,
+                  "average": 3.75,
+                  "functions_min": 0.0,
+                  "functions_max": 0.0,
+                  "closures_min": 3.0,
+                  "closures_max": 4.0
+                }
+                "#
                 );
             },
         );

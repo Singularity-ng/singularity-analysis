@@ -317,8 +317,8 @@ impl SemanticAnalyzer {
 
     /// Calculate nesting level in code
     fn calculate_nesting_level(&self, code: &str) -> usize {
-        let mut max_nesting = 0;
-        let mut current_nesting = 0;
+        let mut max_nesting: usize = 0;
+        let mut current_nesting: usize = 0;
         
         for line in code.lines() {
             let trimmed = line.trim();
@@ -329,7 +329,7 @@ impl SemanticAnalyzer {
                     '{' | '[' | '(' => current_nesting += 1,
                     '}' | ']' | ')' => {
                         if current_nesting > 0 {
-                            current_nesting -= 1;
+                            current_nesting = current_nesting.saturating_sub(1);
                         }
                     }
                     _ => {}
@@ -373,7 +373,7 @@ impl SemanticAnalyzer {
         
         self.language_patterns
             .entry(pattern.language)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(pattern);
     }
 
@@ -402,7 +402,7 @@ mod tests {
         let embedding = analyzer.embed_code(code);
         
         assert_eq!(embedding.len(), 128);
-        assert!(embedding.iter().all(|&x| x >= 0.0 && x <= 1.0));
+        assert!(embedding.iter().all(|&x| (0.0..=1.0).contains(&x)));
     }
 
     #[test]

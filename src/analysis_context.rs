@@ -7,7 +7,7 @@ struct CodeRef {
 }
 
 thread_local! {
-    static CURRENT_CODE: RefCell<Option<CodeRef>> = RefCell::new(None);
+    static CURRENT_CODE: RefCell<Option<CodeRef>> = const { RefCell::new(None) };
 }
 
 /// Guard that clears the current code slice when dropped.

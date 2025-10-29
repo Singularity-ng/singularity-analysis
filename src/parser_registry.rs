@@ -13,6 +13,12 @@ pub struct ParserRegistry {
     parsers: HashMap<LANG, Box<dyn ParserFactory>>,
 }
 
+impl Default for ParserRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ParserRegistry {
     /// Create a new empty parser registry.
     pub fn new() -> Self {
@@ -22,6 +28,7 @@ impl ParserRegistry {
     }
 
     /// Create a new parser registry with all built-in parsers registered.
+    #[allow(dead_code)]
     pub fn with_builtins() -> Self {
         let mut registry = Self::new();
         registry.register_builtin_parsers();
@@ -55,8 +62,8 @@ impl ParserRegistry {
     }
 
     /// Get a parser factory for the specified language.
-    pub fn get_factory(&self, language: &LANG) -> Option<&Box<dyn ParserFactory>> {
-        self.parsers.get(language)
+    pub fn get_factory(&self, language: &LANG) -> Option<&dyn ParserFactory> {
+        self.parsers.get(language).map(|boxed| boxed.as_ref())
     }
 
     /// Create a parser for the given code and language.
@@ -220,7 +227,6 @@ impl<
             LANG::Go => vec!["go"],
             LANG::Csharp => vec!["cs", "csx"],
             // Kotlin, C not yet fully implemented
-            _ => vec![],
         }
     }
 

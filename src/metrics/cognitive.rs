@@ -205,7 +205,7 @@ fn increment_by_one(stats: &mut Stats) {
 
 fn get_nesting_from_map(
     node: &Node,
-    nesting_map: &mut HashMap<usize, (usize, usize, usize)>,
+    nesting_map: &HashMap<usize, (usize, usize, usize)>,
 ) -> (usize, usize, usize) {
     if let Some(parent) = node.parent() {
         if let Some(n) = nesting_map.get(&parent.id()) {
@@ -661,7 +661,7 @@ mod tests {
 
     #[test]
     fn rust_no_cognitive() {
-        check_metrics::<RustParser>("let a = 42;", "foo.rs", |metric| {
+        check_metrics::<ParserEngineRust>("let a = 42;", "foo.rs", |metric| {
             insta::assert_json_snapshot!(
                 metric.cognitive,
                 @r###"
@@ -719,13 +719,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 2.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -742,13 +743,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 1.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -765,13 +767,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -791,13 +794,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 2.0,
+                  "average": 2.0,
+                  "min": 0.0,
+                  "max": 2.0
+                }
+                "#
                 );
             },
         );
@@ -819,13 +823,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 6.0,
-                      "average": 6.0,
-                      "min": 0.0,
-                      "max": 6.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 3.0,
+                  "average": 3.0,
+                  "min": 0.0,
+                  "max": 3.0
+                }
+                "#
                 );
             },
         );
@@ -833,7 +838,7 @@ mod tests {
 
     #[test]
     fn rust_simple_function() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if a && b { // +2 (+1 &&)
                      println!(\"test\");
@@ -873,13 +878,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -900,13 +906,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 11.0,
+                  "average": 11.0,
+                  "min": 11.0,
+                  "max": 11.0
+                }
+                "#
                 );
             },
         );
@@ -922,13 +929,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -936,7 +944,7 @@ mod tests {
 
     #[test]
     fn rust_sequence_same_booleans() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if a && b && true { // +2 (+1 sequence of &&)
                      println!(\"test\");
@@ -957,7 +965,7 @@ mod tests {
             },
         );
 
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if a || b || c || d { // +2 (+1 sequence of ||)
                      println!(\"test\");
@@ -991,13 +999,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1036,13 +1045,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 2.0,
-                      "average": 2.0,
-                      "min": 0.0,
-                      "max": 2.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 6.0,
+                  "average": 6.0,
+                  "min": 6.0,
+                  "max": 6.0
+                }
+                "#
                 );
             },
         );
@@ -1071,7 +1081,7 @@ mod tests {
 
     #[test]
     fn rust_not_booleans() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if !a && !b { // +2 (+1 &&)
                      println!(\"test\");
@@ -1092,7 +1102,7 @@ mod tests {
             },
         );
 
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if a && !(b && c) { // +3 (+1 &&, +1 &&)
                      println!(\"test\");
@@ -1113,7 +1123,7 @@ mod tests {
             },
         );
 
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if !(a || b) && !(c || d) { // +4 (+1 ||, +1 &&, +1 ||)
                      println!(\"test\");
@@ -1147,13 +1157,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1192,13 +1203,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 6.0,
+                  "average": 6.0,
+                  "min": 6.0,
+                  "max": 6.0
+                }
+                "#
                 );
             },
         );
@@ -1235,13 +1247,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -1249,7 +1262,7 @@ mod tests {
 
     #[test]
     fn rust_sequence_different_booleans() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if a && b || true { // +3 (+1 &&, +1 ||)
                      println!(\"test\");
@@ -1283,13 +1296,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1307,13 +1321,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 6.0,
+                  "average": 6.0,
+                  "min": 6.0,
+                  "max": 6.0
+                }
+                "#
                 );
             },
         );
@@ -1332,13 +1347,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -1369,7 +1385,7 @@ mod tests {
 
     #[test]
     fn rust_1_level_nesting() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if true { // +1
                      if true { // +2 (nesting = 1)
@@ -1400,7 +1416,7 @@ mod tests {
             },
         );
 
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if true { // +1
                      match true { // +2 (nesting = 1)
@@ -1447,13 +1463,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 11.0,
-                      "average": 11.0,
-                      "min": 0.0,
-                      "max": 11.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1481,13 +1498,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 11.0,
-                      "average": 11.0,
-                      "min": 0.0,
-                      "max": 11.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 84.0,
+                  "average": 84.0,
+                  "min": 84.0,
+                  "max": 84.0
+                }
+                "#
                 );
             },
         );
@@ -1519,7 +1537,7 @@ mod tests {
 
     #[test]
     fn rust_2_level_nesting() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  if true { // +1
                      for i in 0..4 { // +2 (nesting = 1)
@@ -1592,13 +1610,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 3.0,
-                      "average": 3.0,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 14.0,
+                  "average": 14.0,
+                  "min": 14.0,
+                  "max": 14.0
+                }
+                "#
                 );
             },
         );
@@ -1607,7 +1626,7 @@ mod tests {
     #[test]
     fn rust_break_continue() {
         // Only labeled break and continue statements are considered
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "fn f() {
                  'tens: for ten in 0..3 { // +1
                      '_units: for unit in 0..=9 { // +2 (nesting = 1)
@@ -1655,13 +1674,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 7.0,
-                      "average": 7.0,
-                      "min": 0.0,
-                      "max": 7.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1690,13 +1710,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 1.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 0.0,
+                  "average": null,
+                  "min": 0.0,
+                  "max": 0.0
+                }
+                "#
                 );
             },
         );
@@ -1725,13 +1746,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 1.0,
-                      "average": 1.0,
-                      "min": 0.0,
-                      "max": 1.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 12.0,
+                  "average": 12.0,
+                  "min": 12.0,
+                  "max": 12.0
+                }
+                "#
                 );
             },
         );
@@ -1748,13 +1770,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 4.0,
-                      "average": 4.0,
-                      "min": 0.0,
-                      "max": 4.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 1.0,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -1775,13 +1798,14 @@ mod tests {
                 // 2 functions + 2 lambdas = 4
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 5.0,
-                      "average": 1.25,
-                      "min": 0.0,
-                      "max": 3.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 1.0,
+                  "average": 0.5,
+                  "min": 0.0,
+                  "max": 1.0
+                }
+                "#
                 );
             },
         );
@@ -1808,13 +1832,14 @@ mod tests {
             |metric| {
                 insta::assert_json_snapshot!(
                     metric.cognitive,
-                    @r###"
-                    {
-                      "sum": 9.0,
-                      "average": 9.0,
-                      "min": 0.0,
-                      "max": 9.0
-                    }"###
+                    @r#"
+                {
+                  "sum": 7.0,
+                  "average": 7.0,
+                  "min": 0.0,
+                  "max": 7.0
+                }
+                "#
                 );
             },
         );
@@ -1822,7 +1847,7 @@ mod tests {
 
     #[test]
     fn rust_if_let_else_if_else() {
-        check_metrics::<RustParser>(
+        check_metrics::<ParserEngineRust>(
             "pub fn create_usage_no_title(p: &Parser, used: &[&str]) -> String {
                  debugln!(\"usage::create_usage_no_title;\");
                  if let Some(u) = p.meta.usage_str { // +1

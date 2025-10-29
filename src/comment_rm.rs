@@ -40,10 +40,10 @@ pub fn rm_comments<T: ParserTrait>(parser: &T) -> Option<Vec<u8>> {
     }
 }
 
-fn remove_from_code(code: &[u8], mut spans: Vec<(usize, usize, usize)>) -> Vec<u8> {
+fn remove_from_code(code: &[u8], spans: Vec<(usize, usize, usize)>) -> Vec<u8> {
     let mut new_code = Vec::with_capacity(code.len());
     let mut code_start = 0;
-    for (start, end, lines) in spans.drain(..).rev() {
+    for (start, end, lines) in spans.into_iter().rev() {
         new_code.extend(&code[code_start..start]);
         if lines != 0 {
             if lines <= CR.len() {

@@ -26,7 +26,7 @@ impl Default for SemanticComplexityStats {
 impl SemanticComplexityStats {
     pub fn calculate_semantic_complexity(&mut self, code: &str, language: LANG) -> f64 {
         let patterns = self.analyze_semantic_patterns(code, language);
-        let total_complexity: f64 = patterns.iter().map(|p| p.complexity_weight).sum();
+        let total_complexity: f64 = patterns.iter().sum();
         let function_count = patterns.len();
         
         self.average_complexity = if function_count > 0 {
@@ -35,19 +35,15 @@ impl SemanticComplexityStats {
             0.0
         };
         
-        self.max_complexity = patterns.iter()
-            .map(|p| p.complexity_weight)
-            .fold(0.0, f64::max);
-        
-        self.min_complexity = patterns.iter()
-            .map(|p| p.complexity_weight)
-            .fold(f64::MAX, f64::min);
+        self.max_complexity = patterns.iter().fold(0.0, |acc, value| acc.max(*value));
+
+        self.min_complexity = patterns.iter().fold(f64::MAX, |acc, value| acc.min(*value));
         
         self.semantic_score = (self.average_complexity / 100.0 * 100.0).min(100.0);
         self.semantic_score
     }
     
-    fn analyze_semantic_patterns(&self, code: &str, language: LANG) -> Vec<SemanticPattern> {
+    fn analyze_semantic_patterns(&self, code: &str, language: LANG) -> Vec<f64> {
         let mut patterns = Vec::new();
         let functions = self.extract_functions(code, language);
         
@@ -63,13 +59,11 @@ impl SemanticComplexityStats {
         let mut functions = Vec::new();
         let lines: Vec<&str> = code.lines().collect();
         
-        for (i, line) in lines.iter().enumerate() {
+        for line in lines.iter() {
             if self.is_function_line(line, language) {
                 functions.push(FunctionInfo {
                     name: self.extract_function_name(line),
                     content: line.to_string(),
-                    line_start: i + 1,
-                    line_end: i + 1,
                 });
             }
         }
@@ -99,7 +93,7 @@ impl SemanticComplexityStats {
         "unknown".to_string()
     }
     
-    fn analyze_function_complexity(&self, func: &FunctionInfo, language: LANG) -> SemanticPattern {
+    fn analyze_function_complexity(&self, func: &FunctionInfo, language: LANG) -> f64 {
         let mut complexity_weight = 0.0;
         
         complexity_weight += self.analyze_name_complexity(&func.name);
@@ -121,10 +115,7 @@ impl SemanticComplexityStats {
             complexity_weight += 12.0;
         }
         
-        SemanticPattern {
-            name: func.name.clone(),
-            complexity_weight: complexity_weight.min(100.0),
-        }
+        complexity_weight.clamp(0.0, 100.0)
     }
     
     fn analyze_name_complexity(&self, name: &str) -> f64 {
@@ -197,14 +188,6 @@ impl SemanticComplexityStats {
 struct FunctionInfo {
     name: String,
     content: String,
-    line_start: usize,
-    line_end: usize,
-}
-
-#[derive(Debug, Clone)]
-struct SemanticPattern {
-    name: String,
-    complexity_weight: f64,
 }
 
 #[cfg(test)]
