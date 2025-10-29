@@ -121,3 +121,52 @@ pub use crate::code_analyzer::*;
 
 mod comment_rm;
 pub use crate::comment_rm::*;
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_go_language_support() {
+        let analyzer = SingularityCodeAnalyzer::new();
+
+        // Test language string detection
+        assert_eq!(analyzer.language_from_str("go"), Some(LANG::Go));
+        assert_eq!(analyzer.language_from_str("golang"), Some(LANG::Go));
+
+        // Test file extension detection
+        assert_eq!(
+            analyzer.detect_language_from_path(&PathBuf::from("main.go")),
+            Some(LANG::Go)
+        );
+
+        // Verify Go is in supported languages
+        assert!(analyzer.supported_languages().contains(&LANG::Go),
+                "Go not in supported languages: {:?}", analyzer.supported_languages());
+    }
+
+    #[test]
+    fn test_csharp_language_support() {
+        let analyzer = SingularityCodeAnalyzer::new();
+
+        // Test language string detection
+        assert_eq!(analyzer.language_from_str("csharp"), Some(LANG::Csharp));
+        assert_eq!(analyzer.language_from_str("c#"), Some(LANG::Csharp));
+
+        // Test file extension detection
+        assert_eq!(
+            analyzer.detect_language_from_path(&PathBuf::from("Program.cs")),
+            Some(LANG::Csharp)
+        );
+        assert_eq!(
+            analyzer.detect_language_from_path(&PathBuf::from("file.csx")),
+            Some(LANG::Csharp)
+        );
+
+        // Test basic C# code analysis
+        let csharp_code = "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello\");\n    }\n}";
+        let result = analyzer.analyze_language(LANG::Csharp, csharp_code, AnalyzeOptions::default());
+        assert!(result.is_ok());
+    }
+}

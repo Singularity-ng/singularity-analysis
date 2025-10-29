@@ -170,11 +170,8 @@ impl Stats {
     }
     #[inline(always)]
     pub(crate) fn compute_minmax(&mut self) {
-        self.closure_nargs_min = self.closure_nargs_min.min(self.closure_nargs);
-        self.closure_nargs_max = self.closure_nargs_max.max(self.closure_nargs);
-        self.fn_nargs_min = self.fn_nargs_min.min(self.fn_nargs);
-        self.fn_nargs_max = self.fn_nargs_max.max(self.fn_nargs);
-        self.compute_sum();
+        // No-op for NArgs: accumulation happens immediately in compute()
+        // This method is kept for API compatibility with other metrics
     }
     pub(crate) fn finalize(&mut self, total_functions: usize, total_closures: usize) {
         self.total_functions = total_functions;
@@ -201,12 +198,28 @@ where
 {
     fn compute(node: &Node, stats: &mut Stats) {
         if Self::is_func(node) {
+            // Track old value to compute delta (just this function's args)
+            let old_fn_nargs = stats.fn_nargs;
             compute_args::<Self>(node, &mut stats.fn_nargs);
+            let this_fn_args = stats.fn_nargs - old_fn_nargs;
+
+            // Immediately accumulate this function's args (don't wait for finalization)
+            stats.fn_nargs_sum += this_fn_args;
+            stats.fn_nargs_min = stats.fn_nargs_min.min(this_fn_args);
+            stats.fn_nargs_max = stats.fn_nargs_max.max(this_fn_args);
             return;
         }
 
         if Self::is_closure(node) {
+            // Track old value to compute delta (just this closure's args)
+            let old_closure_nargs = stats.closure_nargs;
             compute_args::<Self>(node, &mut stats.closure_nargs);
+            let this_closure_args = stats.closure_nargs - old_closure_nargs;
+
+            // Immediately accumulate this closure's args (don't wait for finalization)
+            stats.closure_nargs_sum += this_closure_args;
+            stats.closure_nargs_min = stats.closure_nargs_min.min(this_closure_args);
+            stats.closure_nargs_max = stats.closure_nargs_max.max(this_closure_args);
         }
     }
 }
@@ -214,18 +227,34 @@ where
 impl NArgs for CppCode {
     fn compute(node: &Node, stats: &mut Stats) {
         if Self::is_func(node) {
+            // Track old value to compute delta (just this function's args)
+            let old_fn_nargs = stats.fn_nargs;
             if let Some(declarator) = node.child_by_field_name("declarator") {
                 let new_node = declarator;
                 compute_args::<Self>(&new_node, &mut stats.fn_nargs);
             }
+            let this_fn_args = stats.fn_nargs - old_fn_nargs;
+
+            // Immediately accumulate this function's args (don't wait for finalization)
+            stats.fn_nargs_sum += this_fn_args;
+            stats.fn_nargs_min = stats.fn_nargs_min.min(this_fn_args);
+            stats.fn_nargs_max = stats.fn_nargs_max.max(this_fn_args);
             return;
         }
 
         if Self::is_closure(node) {
+            // Track old value to compute delta (just this closure's args)
+            let old_closure_nargs = stats.closure_nargs;
             if let Some(declarator) = node.child_by_field_name("declarator") {
                 let new_node = declarator;
                 compute_args::<Self>(&new_node, &mut stats.closure_nargs);
             }
+            let this_closure_args = stats.closure_nargs - old_closure_nargs;
+
+            // Immediately accumulate this closure's args (don't wait for finalization)
+            stats.closure_nargs_sum += this_closure_args;
+            stats.closure_nargs_min = stats.closure_nargs_min.min(this_closure_args);
+            stats.closure_nargs_max = stats.closure_nargs_max.max(this_closure_args);
         }
     }
 }

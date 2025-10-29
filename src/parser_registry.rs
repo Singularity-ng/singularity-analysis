@@ -106,6 +106,8 @@ impl ParserRegistry {
         self.register_parser::<ErlangCode>(LANG::Erlang);
         self.register_parser::<GleamCode>(LANG::Gleam);
         self.register_parser::<LuaCode>(LANG::Lua);
+        self.register_parser::<GoCode>(LANG::Go);
+        self.register_parser::<CsharpCode>(LANG::Csharp);
     }
 
     /// Helper method to register a built-in parser.
@@ -215,7 +217,9 @@ impl<
             LANG::Erlang => vec!["erl", "hrl"],
             LANG::Gleam => vec!["gleam"],
             LANG::Lua => vec!["lua"],
-            // Kotlin, Go, Csharp, C not yet fully implemented
+            LANG::Go => vec!["go"],
+            LANG::Csharp => vec!["cs", "csx"],
+            // Kotlin, C not yet fully implemented
             _ => vec![],
         }
     }
