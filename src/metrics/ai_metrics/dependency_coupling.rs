@@ -50,7 +50,8 @@ impl DependencyCouplingMetrics {
         let violation_penalty = (violations as f64) * 0.15;
         let external_penalty = external_ratio.clamp(0.0, 1.0) * 10.0 * 0.1;
 
-        let total_penalty = density_penalty + cyclic_penalty + depth_penalty + violation_penalty + external_penalty;
+        let total_penalty =
+            density_penalty + cyclic_penalty + depth_penalty + violation_penalty + external_penalty;
         let coupling_score = (100.0 - total_penalty).clamp(0.0, 100.0);
 
         Self {
@@ -73,7 +74,10 @@ impl DependencyCouplingMetrics {
         for (from, to) in imports {
             all_modules.insert(from.clone());
             all_modules.insert(to.clone());
-            import_graph.entry(from.clone()).or_default().push(to.clone());
+            import_graph
+                .entry(from.clone())
+                .or_default()
+                .push(to.clone());
         }
 
         let import_density = imports.len() as f64;
@@ -84,7 +88,9 @@ impl DependencyCouplingMetrics {
         // Estimate external imports (paths containing node_modules, vendor, etc.)
         let external_count = imports
             .iter()
-            .filter(|(_, to)| to.contains("node_modules") || to.contains("vendor") || to.contains("std::"))
+            .filter(|(_, to)| {
+                to.contains("node_modules") || to.contains("vendor") || to.contains("std::")
+            })
             .count();
         let external_ratio = if imports.is_empty() {
             0.0
@@ -212,12 +218,8 @@ impl DependencyCouplingMetrics {
     fn is_layer_violation(from: &str, to: &str) -> bool {
         let layer_order = ["lib", "core", "domain", "services", "controllers", "views"];
 
-        let from_layer = layer_order
-            .iter()
-            .position(|&layer| from.contains(layer));
-        let to_layer = layer_order
-            .iter()
-            .position(|&layer| to.contains(layer));
+        let from_layer = layer_order.iter().position(|&layer| from.contains(layer));
+        let to_layer = layer_order.iter().position(|&layer| to.contains(layer));
 
         match (from_layer, to_layer) {
             (Some(f), Some(t)) => f < t,

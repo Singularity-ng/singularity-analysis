@@ -44,6 +44,45 @@ pub fn extract_complexity_features(code: &str, language: LANG) -> ComplexityFeat
     }
 }
 
+/// Extract complexity features from code with custom patterns
+/// This version allows passing in language-specific patterns from the registry
+#[inline(always)]
+pub fn extract_complexity_features_with_patterns(
+    code: &str, 
+    function_patterns: &[String],
+    control_flow_patterns: &[String],
+    operator_patterns: &[String],
+    opening_delimiters: &[String],
+    closing_delimiters: &[String],
+    comment_patterns: &[String]
+) -> ComplexityFeatures {
+    let lines: Vec<&str> = code.lines().collect();
+    let non_empty_lines: Vec<&str> = lines.iter()
+        .filter(|line| !line.trim().is_empty())
+        .map(|s| *s)
+        .collect();
+    
+    // Convert Vec<String> to Vec<&str> for compatibility
+    let function_patterns_str: Vec<&str> = function_patterns.iter().map(|s| s.as_str()).collect();
+    let control_flow_patterns_str: Vec<&str> = control_flow_patterns.iter().map(|s| s.as_str()).collect();
+    let operator_patterns_str: Vec<&str> = operator_patterns.iter().map(|s| s.as_str()).collect();
+    let opening_delimiters_str: Vec<&str> = opening_delimiters.iter().map(|s| s.as_str()).collect();
+    let closing_delimiters_str: Vec<&str> = closing_delimiters.iter().map(|s| s.as_str()).collect();
+    let comment_patterns_str: Vec<&str> = comment_patterns.iter().map(|s| s.as_str()).collect();
+    
+    ComplexityFeatures {
+        total_lines: lines.len(),
+        non_empty_lines: non_empty_lines.len(),
+        function_count: count_patterns(code, &function_patterns_str),
+        control_flow_count: count_patterns(code, &control_flow_patterns_str),
+        nesting_depth: calculate_max_nesting_depth_with_patterns(code, &opening_delimiters_str, &closing_delimiters_str),
+        operator_count: count_patterns(code, &operator_patterns_str),
+        comment_ratio: calculate_comment_ratio_with_patterns(code, &comment_patterns_str),
+        identifier_length_avg: calculate_avg_identifier_length(code, language), // This doesn't need patterns
+        cyclomatic_complexity: calculate_cyclomatic_complexity_estimate(code, language), // This doesn't need patterns
+    }
+}
+
 /// Calculate structural complexity based on code organization
 #[inline(always)]
 pub fn calculate_structural_complexity(features: &ComplexityFeatures) -> f64 {
@@ -253,6 +292,85 @@ pub fn get_comment_patterns(language: LANG) -> Vec<&'static str> {
         LANG::Lua => vec!["--"],
         _ => vec!["//", "#"],
     }
+}
+
+/// Calculate maximum nesting depth with custom patterns
+#[inline(always)]
+pub fn calculate_max_nesting_depth_with_patterns(
+    code: &str, 
+    opening_patterns: &[&str], 
+    closing_patterns: &[&str]
+) -> usize {
+    let mut max_depth = 0;
+    let mut current_depth = 0;
+    
+    for line in code.lines() {
+        let trimmed = line.trim();
+        
+        // Count opening delimiters
+        for pattern in opening_patterns {
+            current_depth += trimmed.matches(pattern).count();
+        }
+        
+        // Count closing delimiters
+        for pattern in closing_patterns {
+            current_depth = current_depth.saturating_sub(trimmed.matches(pattern).count());
+        }
+        
+        max_depth = max_depth.max(current_depth);
+    }
+    
+    max_depth
+}
+
+/// Calculate comment ratio with custom patterns
+#[inline(always)]
+pub fn calculate_comment_ratio_with_patterns(code: &str, comment_patterns: &[&str]) -> f64 {
+    let lines: Vec<&str> = code.lines().collect();
+    
+    let comment_lines = lines.iter()
+        .filter(|line| {
+            let trimmed = line.trim();
+            comment_patterns.iter().any(|pattern| trimmed.starts_with(pattern))
+        })
+        .count();
+    
+    if lines.is_empty() {
+        0.0
+    } else {
+        comment_lines as f64 / lines.len() as f64
+    }
+}
+
+/// Calculate comprehensive complexity score with custom patterns
+#[inline(always)]
+pub fn calculate_ai_complexity_score_with_patterns(
+    code: &str,
+    function_patterns: &[String],
+    control_flow_patterns: &[String],
+    operator_patterns: &[String],
+    opening_delimiters: &[String],
+    closing_delimiters: &[String],
+    comment_patterns: &[String]
+) -> f64 {
+    let features = extract_complexity_features_with_patterns(
+        code,
+        function_patterns,
+        control_flow_patterns,
+        operator_patterns,
+        opening_delimiters,
+        closing_delimiters,
+        comment_patterns
+    );
+    
+    // Weighted complexity calculation
+    let structural_complexity = calculate_structural_complexity(&features);
+    let cognitive_complexity = calculate_cognitive_complexity(&features);
+    let maintainability_complexity = calculate_maintainability_complexity(&features);
+    
+    // AI-optimized weighting for learning
+    (structural_complexity * 0.4 + cognitive_complexity * 0.4 + maintainability_complexity * 0.2)
+        .min(10.0) // Cap at 10.0 for consistency
 }
 
 /// Calculate average identifier length

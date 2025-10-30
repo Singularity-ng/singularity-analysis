@@ -52,13 +52,12 @@ impl TypeSafetyMetrics {
         // 0.15 * explicit_type_ratio +
         // 0.1 * pattern_matching_score
 
-        let type_safety_score = (
-            0.3 * annotation_coverage +
-            0.2 * generic_usage +
-            0.25 * (1.0 - unsafe_ratio) +
-            0.15 * explicit_type_ratio +
-            0.1 * pattern_matching
-        ) * 100.0;
+        let type_safety_score = (0.3 * annotation_coverage
+            + 0.2 * generic_usage
+            + 0.25 * (1.0 - unsafe_ratio)
+            + 0.15 * explicit_type_ratio
+            + 0.1 * pattern_matching)
+            * 100.0;
 
         let mut language_scores = HashMap::new();
         language_scores.insert(
@@ -122,11 +121,9 @@ pub fn analyze_typescript_type_safety(code: &str) -> TypeSafetyMetrics {
     let generic_usage = code.matches('<').count().min(10) as f64 / 10.0;
 
     let explicit_types = code.matches("as ").count() + annotation_count;
-    let total_declarations = (
-        code.matches("let ").count()
-            + code.matches("const ").count()
-            + code.matches("var ").count()
-    )
+    let total_declarations = (code.matches("let ").count()
+        + code.matches("const ").count()
+        + code.matches("var ").count())
     .max(1);
     let explicit_type_ratio = (explicit_types as f64 / total_declarations as f64).clamp(0.0, 1.0);
 
@@ -150,7 +147,8 @@ pub fn analyze_python_type_safety(code: &str) -> TypeSafetyMetrics {
     let annotation_count = code.matches(": ").count();
     let annotation_coverage = (annotation_count as f64 / line_count).clamp(0.0, 1.0);
 
-    let generic_usage = (code.matches("Generic").count() + code.matches("TypeVar").count()) as f64 / 10.0;
+    let generic_usage =
+        (code.matches("Generic").count() + code.matches("TypeVar").count()) as f64 / 10.0;
 
     let total_declarations = (code.matches("def ").count() + code.matches("class ").count()).max(1);
     let explicit_type_ratio = (annotation_count as f64 / total_declarations as f64).clamp(0.0, 1.0);
@@ -224,12 +222,11 @@ mod tests {
     #[test]
     fn test_calculate_formula() {
         let metrics = TypeSafetyMetrics::calculate(
-            "test",
-            0.8,  // annotation_coverage
-            0.5,  // generic_usage
-            0.1,  // unsafe_ratio
-            0.7,  // explicit_type_ratio
-            0.6,  // pattern_matching
+            "test", 0.8, // annotation_coverage
+            0.5, // generic_usage
+            0.1, // unsafe_ratio
+            0.7, // explicit_type_ratio
+            0.6, // pattern_matching
         );
 
         // Expected: 0.3*0.8 + 0.2*0.5 + 0.25*(1-0.1) + 0.15*0.7 + 0.1*0.6

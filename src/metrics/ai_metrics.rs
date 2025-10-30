@@ -23,22 +23,22 @@
 //! ### Database Integration
 //! - `postgresql_enriched` - PostgreSQL-backed pattern learning
 
-pub mod semantic_complexity;
-pub mod refactoring_readiness;
 pub mod ai_code_quality;
 pub mod code_smell_density;
-pub mod testability_score;
-pub mod type_safety;
 pub mod dependency_coupling;
 pub mod error_handling;
 pub mod postgresql_enriched;
+pub mod refactoring_readiness;
+pub mod semantic_complexity;
+pub mod testability_score;
+pub mod type_safety;
 
-pub use semantic_complexity::*;
-pub use refactoring_readiness::*;
 pub use ai_code_quality::*;
 pub use code_smell_density::*;
-pub use testability_score::*;
-pub use type_safety::*;
 pub use dependency_coupling::*;
 pub use error_handling::*;
 pub use postgresql_enriched::*;
+pub use refactoring_readiness::*;
+pub use semantic_complexity::*;
+pub use testability_score::*;
+pub use type_safety::*;

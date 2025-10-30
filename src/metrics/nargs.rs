@@ -500,11 +500,14 @@ mod tests {
 
     #[test]
     fn rust_single_closure() {
-        check_metrics::<ParserEngineRust>("let bar = |i: i32| -> i32 { i + 1 };", "foo.rs", |metric| {
-            // 1 lambda
-            insta::assert_json_snapshot!(
-                metric.nargs,
-                @r###"
+        check_metrics::<ParserEngineRust>(
+            "let bar = |i: i32| -> i32 { i + 1 };",
+            "foo.rs",
+            |metric| {
+                // 1 lambda
+                insta::assert_json_snapshot!(
+                    metric.nargs,
+                    @r###"
                     {
                       "total_functions": 0.0,
                       "total_closures": 1.0,
@@ -517,8 +520,9 @@ mod tests {
                       "closures_min": 0.0,
                       "closures_max": 1.0
                     }"###
-            );
-        });
+                );
+            },
+        );
     }
 
     #[test]

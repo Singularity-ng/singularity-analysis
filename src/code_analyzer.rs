@@ -21,7 +21,11 @@ impl fmt::Display for AnalyzerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AnalyzerError::UnsupportedLanguage(lang) => {
-                write!(f, "language `{}` is not supported by Singularity Code Analyzer", lang)
+                write!(
+                    f,
+                    "language `{}` is not supported by Singularity Code Analyzer",
+                    lang
+                )
             }
             AnalyzerError::AnalysisFailed { language, reason } => write!(
                 f,
@@ -65,15 +69,13 @@ impl AnalyzerResult {
 }
 
 /// Options for running the analyzer over in-memory content.
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct AnalyzeOptions<'a> {
     /// Optional virtual path to associate with the content.
     pub virtual_path: Option<&'a Path>,
     /// Optional preprocessing results (macros, includes, ...).
     pub preprocessor: Option<Arc<PreprocResults>>,
 }
-
 
 /// High-level façade for running Singularity's multi-language metrics engine.
 ///
@@ -142,7 +144,9 @@ impl SingularityCodeAnalyzer {
         options: AnalyzeOptions<'a>,
     ) -> Result<AnalyzerResult, AnalyzerError> {
         if self.registry.get_factory(&language).is_none() {
-            return Err(AnalyzerError::UnsupportedLanguage(language.get_name().to_string()));
+            return Err(AnalyzerError::UnsupportedLanguage(
+                language.get_name().to_string(),
+            ));
         }
 
         let path_buf = options

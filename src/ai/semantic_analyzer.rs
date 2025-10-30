@@ -1,11 +1,11 @@
 //! Semantic Code Analysis for AI/LLM Systems
-//! 
+//!
 //! Provides semantic understanding of code through embeddings,
 //! pattern recognition, and intelligent analysis.
 
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
 use crate::langs::LANG;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Semantic analyzer for code understanding
 #[derive(Debug, Clone)]
@@ -130,18 +130,18 @@ impl SemanticAnalyzer {
         // Simplified embedding generation based on character frequency
         // In production, replace with actual embedding model
         let mut embedding = vec![0.0; 128]; // 128-dimensional embedding
-        
+
         for (i, ch) in code.chars().enumerate() {
             if i < 128 {
                 embedding[i] = (ch as u32) as f32 / 127.0; // Normalize to 0-1
             }
         }
-        
+
         // Add some semantic features
         let lines = code.lines().count() as f32;
         let functions = code.matches("fn ").count() as f32;
         let classes = code.matches("class ").count() as f32;
-        
+
         // Add these as additional dimensions
         if embedding.len() > 100 {
             embedding[100] = lines / 100.0; // Normalize line count
@@ -152,7 +152,7 @@ impl SemanticAnalyzer {
         if embedding.len() > 102 {
             embedding[102] = classes / 5.0; // Normalize class count
         }
-        
+
         embedding
     }
 
@@ -160,11 +160,11 @@ impl SemanticAnalyzer {
     pub fn find_similar_patterns(&self, query: &str) -> Vec<CodePattern> {
         let query_embedding = self.embed_code(query);
         let mut similar_patterns = Vec::new();
-        
+
         // Calculate similarity with stored patterns
         for (pattern_id, pattern_embedding) in &self.code_vectors {
             let similarity = self.cosine_similarity(&query_embedding, pattern_embedding);
-            
+
             if similarity >= self.similarity_threshold {
                 // In a real implementation, you'd retrieve the actual pattern
                 // from a database using the pattern_id
@@ -178,16 +178,17 @@ impl SemanticAnalyzer {
                 });
             }
         }
-        
+
         // Sort by similarity score
-        similar_patterns.sort_by(|a, b| b.complexity_score.partial_cmp(&a.complexity_score).unwrap());
+        similar_patterns
+            .sort_by(|a, b| b.complexity_score.partial_cmp(&a.complexity_score).unwrap());
         similar_patterns
     }
 
     /// Detect code smells and anti-patterns
     pub fn detect_code_smells(&self, code: &str) -> Vec<CodeSmell> {
         let mut code_smells = Vec::new();
-        
+
         // Detect long functions (more than 50 lines)
         let lines = code.lines().count();
         if lines > 50 {
@@ -205,7 +206,7 @@ impl SemanticAnalyzer {
                 suggestion: "Break the function into smaller, more focused functions".to_string(),
             });
         }
-        
+
         // Detect deep nesting (more than 4 levels)
         let nesting_level = self.calculate_nesting_level(code);
         if nesting_level > 4 {
@@ -220,10 +221,11 @@ impl SemanticAnalyzer {
                     column_start: 1,
                     column_end: 1,
                 },
-                suggestion: "Refactor to reduce nesting using early returns or guard clauses".to_string(),
+                suggestion: "Refactor to reduce nesting using early returns or guard clauses"
+                    .to_string(),
             });
         }
-        
+
         // Detect duplicate code patterns
         let duplicates = self.detect_duplicate_code(code);
         for duplicate in duplicates {
@@ -235,14 +237,14 @@ impl SemanticAnalyzer {
                 suggestion: "Extract common code into a reusable function".to_string(),
             });
         }
-        
+
         code_smells
     }
 
     /// Suggest refactoring opportunities
     pub fn suggest_refactoring(&self, code: &str) -> Vec<RefactoringSuggestion> {
         let mut suggestions = Vec::new();
-        
+
         // Suggest extracting long functions
         let lines = code.lines().count();
         if lines > 30 {
@@ -259,7 +261,7 @@ impl SemanticAnalyzer {
                 code_example: "// Extract logic into smaller functions".to_string(),
             });
         }
-        
+
         // Suggest reducing nesting
         let nesting_level = self.calculate_nesting_level(code);
         if nesting_level > 3 {
@@ -276,13 +278,14 @@ impl SemanticAnalyzer {
                 code_example: "// Use early returns or guard clauses".to_string(),
             });
         }
-        
+
         // Suggest removing duplicate code
         let duplicates = self.detect_duplicate_code(code);
         if !duplicates.is_empty() {
             suggestions.push(RefactoringSuggestion {
                 name: "Remove Duplication".to_string(),
-                description: "Duplicate code should be extracted into reusable functions".to_string(),
+                description: "Duplicate code should be extracted into reusable functions"
+                    .to_string(),
                 priority: Priority::Medium,
                 effort: EffortLevel::High,
                 benefits: vec![
@@ -293,7 +296,7 @@ impl SemanticAnalyzer {
                 code_example: "// Extract common code into a shared function".to_string(),
             });
         }
-        
+
         suggestions
     }
 
@@ -303,11 +306,11 @@ impl SemanticAnalyzer {
         if a.len() != b.len() {
             return 0.0;
         }
-        
+
         let dot_product: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
         let norm_a: f32 = a.iter().map(|x| x * x).sum::<f32>().sqrt();
         let norm_b: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();
-        
+
         if norm_a == 0.0 || norm_b == 0.0 {
             0.0
         } else {
@@ -319,10 +322,10 @@ impl SemanticAnalyzer {
     fn calculate_nesting_level(&self, code: &str) -> usize {
         let mut max_nesting: usize = 0;
         let mut current_nesting: usize = 0;
-        
+
         for line in code.lines() {
             let trimmed = line.trim();
-            
+
             // Count opening braces/brackets
             for ch in trimmed.chars() {
                 match ch {
@@ -335,10 +338,10 @@ impl SemanticAnalyzer {
                     _ => {}
                 }
             }
-            
+
             max_nesting = max_nesting.max(current_nesting);
         }
-        
+
         max_nesting
     }
 
@@ -346,7 +349,7 @@ impl SemanticAnalyzer {
     fn detect_duplicate_code(&self, code: &str) -> Vec<CodeLocation> {
         let mut duplicates = Vec::new();
         let lines: Vec<&str> = code.lines().collect();
-        
+
         // Simple duplicate detection based on line similarity
         for i in 0..lines.len() {
             for j in (i + 1)..lines.len() {
@@ -361,7 +364,7 @@ impl SemanticAnalyzer {
                 }
             }
         }
-        
+
         duplicates
     }
 
@@ -370,7 +373,7 @@ impl SemanticAnalyzer {
         let embedding = self.embed_code(&pattern.example);
         let pattern_id = format!("{:?}_{}", pattern.language, pattern.name);
         self.code_vectors.insert(pattern_id, embedding);
-        
+
         self.language_patterns
             .entry(pattern.language)
             .or_default()
@@ -400,7 +403,7 @@ mod tests {
         let analyzer = SemanticAnalyzer::new();
         let code = "fn main() {\n    println!(\"Hello, world!\");\n}";
         let embedding = analyzer.embed_code(code);
-        
+
         assert_eq!(embedding.len(), 128);
         assert!(embedding.iter().all(|&x| (0.0..=1.0).contains(&x)));
     }
@@ -411,7 +414,7 @@ mod tests {
         let a = vec![1.0, 0.0, 0.0];
         let b = vec![1.0, 0.0, 0.0];
         let c = vec![0.0, 1.0, 0.0];
-        
+
         assert_eq!(analyzer.cosine_similarity(&a, &b), 1.0);
         assert_eq!(analyzer.cosine_similarity(&a, &c), 0.0);
     }
@@ -421,7 +424,7 @@ mod tests {
         let analyzer = SemanticAnalyzer::new();
         let long_code = "fn long_function() {\n".repeat(60) + "}";
         let smells = analyzer.detect_code_smells(&long_code);
-        
+
         assert!(!smells.is_empty());
         assert!(smells.iter().any(|s| s.name == "Long Function"));
     }
@@ -443,7 +446,7 @@ mod tests {
         }
         "#;
         let suggestions = analyzer.suggest_refactoring(nested_code);
-        
+
         assert!(!suggestions.is_empty());
         assert!(suggestions.iter().any(|s| s.name == "Reduce Nesting"));
     }

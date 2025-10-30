@@ -18,11 +18,16 @@ fn main() {
 
 fn print_tree(node: &tree_sitter::Node, depth: usize) {
     let indent = "  ".repeat(depth);
-    println!("{}[{:3}] {} ({})",
+    println!(
+        "{}[{:3}] {} ({})",
         indent,
         node.kind_id(),
         node.kind(),
-        if node.child_count() > 0 { format!("{} children", node.child_count()) } else { "leaf".to_string() }
+        if node.child_count() > 0 {
+            format!("{} children", node.child_count())
+        } else {
+            "leaf".to_string()
+        }
     );
 
     for i in 0..node.child_count() {

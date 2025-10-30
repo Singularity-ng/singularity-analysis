@@ -58,13 +58,12 @@ impl ErrorHandlingMetrics {
             log_statements,
         } = inputs;
 
-        let error_handling_score = (
-            0.3 * error_type_coverage +
-            0.25 * (1.0 - unhandled_paths_ratio) +
-            0.2 * specific_catches_ratio +
-            0.15 * logging_coverage +
-            0.1 * fallback_coverage
-        ) * 100.0;
+        let error_handling_score = (0.3 * error_type_coverage
+            + 0.25 * (1.0 - unhandled_paths_ratio)
+            + 0.2 * specific_catches_ratio
+            + 0.15 * logging_coverage
+            + 0.1 * fallback_coverage)
+            * 100.0;
 
         Self {
             error_handling_score: error_handling_score.clamp(0.0, 100.0),
@@ -89,6 +88,11 @@ impl ErrorHandlingMetrics {
             _ => Self::analyze_generic_errors(code),
         }
     }
+
+    /// Analyze error handling in code with custom patterns
+    pub fn from_code_with_patterns(code: &str, error_patterns: &[String]) -> Self {
+        Self::analyze_with_patterns(code, error_patterns)
+    }
 }
 
 impl ErrorHandlingMetrics {
@@ -101,12 +105,12 @@ impl ErrorHandlingMetrics {
         let expect_calls = code.matches(".expect").count();
         let question_marks = code.matches("?").count();
 
-        let specific_catches_ratio =
-            (match_handlers + if_let_handlers + question_marks) as f64
-                / (error_handlers as f64 + 1.0);
+        let specific_catches_ratio = (match_handlers + if_let_handlers + question_marks) as f64
+            / (error_handlers as f64 + 1.0);
 
         let unhandled_paths = unwrap_calls + expect_calls;
-        let unhandled_ratio = unhandled_paths as f64 / (match_handlers as f64 + if_let_handlers as f64 + 1.0);
+        let unhandled_ratio =
+            unhandled_paths as f64 / (match_handlers as f64 + if_let_handlers as f64 + 1.0);
 
         let log_statements = code.matches("error!").count()
             + code.matches("warn!").count()
@@ -115,13 +119,59 @@ impl ErrorHandlingMetrics {
         let fallback_coverage = question_marks as f64 / (error_handlers as f64 + 1.0);
 
         Self::calculate(ErrorHandlingInputs {
-            error_type_coverage: (error_handlers as f64 / error_handlers.max(1) as f64).clamp(0.0, 1.0),
+            error_type_coverage: (error_handlers as f64 / error_handlers.max(1) as f64)
+                .clamp(0.0, 1.0),
             unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
             specific_catches_ratio: specific_catches_ratio.clamp(0.0, 1.0),
-            logging_coverage: (log_statements as f64 / error_handlers.max(1) as f64).clamp(0.0, 1.0),
+            logging_coverage: (log_statements as f64 / error_handlers.max(1) as f64)
+                .clamp(0.0, 1.0),
             fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
             error_handlers,
             generic_catches: 0,
+            log_statements,
+        })
+    }
+
+    /// Analyze error handling with custom patterns from registry
+    fn analyze_with_patterns(code: &str, error_patterns: &[String]) -> Self {
+        let mut error_handlers = 0;
+        let mut try_blocks = 0;
+        let mut catch_blocks = 0;
+        let generic_catches = 0;
+        let mut log_statements = 0;
+        let mut unhandled_calls = 0;
+
+        // Count patterns using the provided error patterns
+        for pattern in error_patterns {
+            match pattern.as_str() {
+                "Result" | "Option" => error_handlers += code.matches(pattern).count(),
+                "try" => try_blocks += code.matches(pattern).count(),
+                "catch" => catch_blocks += code.matches(pattern).count(),
+                "unwrap" | "expect" => unhandled_calls += code.matches(pattern).count(),
+                "error!" | "warn!" | "eprintln!" => log_statements += code.matches(pattern).count(),
+                _ => {} // Other patterns can be handled as needed
+            }
+        }
+
+        // Calculate metrics
+        let error_type_coverage: f64 = if error_handlers == 0 { 0.0_f64 } else { 1.0_f64 };
+        let unhandled_ratio = if (try_blocks + catch_blocks) == 0 { 
+            0.0 
+        } else { 
+            unhandled_calls as f64 / (try_blocks + catch_blocks) as f64 
+        };
+        let specific_catches_ratio: f64 = if catch_blocks == 0 { 0.0_f64 } else { 1.0_f64 };
+        let logging_coverage = if error_handlers == 0 { 0.0 } else { log_statements as f64 / error_handlers as f64 };
+        let fallback_coverage = if try_blocks == 0 { 0.0 } else { catch_blocks as f64 / try_blocks as f64 };
+
+        Self::calculate(ErrorHandlingInputs {
+            error_type_coverage: error_type_coverage.clamp(0.0, 1.0),
+            unhandled_paths_ratio: unhandled_ratio.clamp(0.0, 1.0),
+            specific_catches_ratio: specific_catches_ratio.clamp(0.0, 1.0),
+            logging_coverage: logging_coverage.clamp(0.0, 1.0),
+            fallback_coverage: fallback_coverage.clamp(0.0, 1.0),
+            error_handlers,
+            generic_catches,
             log_statements,
         })
     }
@@ -171,7 +221,8 @@ impl ErrorHandlingMetrics {
     fn analyze_js_errors(code: &str) -> Self {
         let try_blocks = code.matches("try {").count();
         let catch_blocks = code.matches("catch (").count();
-        let generic_catches = code.matches("catch (e)").count() + code.matches("catch (err)").count();
+        let generic_catches =
+            code.matches("catch (e)").count() + code.matches("catch (err)").count();
         let specific_catches = catch_blocks - generic_catches;
         let finally_blocks = code.matches("finally {").count();
         let throw_statements = code.matches("throw ").count();
@@ -185,8 +236,8 @@ impl ErrorHandlingMetrics {
         let specific_ratio = error_type_coverage;
         let unhandled_ratio = throw_statements as f64 / (try_blocks.max(1) as f64);
 
-        let log_statements = code.matches("console.error").count()
-            + code.matches("logger.error").count();
+        let log_statements =
+            code.matches("console.error").count() + code.matches("logger.error").count();
 
         let fallback_coverage = finally_blocks as f64 / (try_blocks.max(1) as f64);
 
@@ -220,8 +271,8 @@ impl ErrorHandlingMetrics {
         let specific_ratio = error_type_coverage;
         let unhandled_ratio = throws as f64 / (try_blocks.max(1) as f64);
 
-        let log_statements = code.matches("logger.error").count()
-            + code.matches("e.printStackTrace").count();
+        let log_statements =
+            code.matches("logger.error").count() + code.matches("e.printStackTrace").count();
 
         let fallback_coverage = finally_blocks as f64 / (try_blocks.max(1) as f64);
 

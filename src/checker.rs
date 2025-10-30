@@ -31,13 +31,19 @@ macro_rules! check_if_func {
 
 macro_rules! is_js_func {
     ($parser: ident, $node: ident) => {
-        matches!($node.kind(), "function_declaration" | "method_definition" | "function_expression")
+        matches!(
+            $node.kind(),
+            "function_declaration" | "method_definition" | "function_expression"
+        )
     };
 }
 
 macro_rules! is_js_closure {
     ($parser: ident, $node: ident) => {
-        matches!($node.kind(), "arrow_function" | "generator_function" | "generator_function_declaration")
+        matches!(
+            $node.kind(),
+            "arrow_function" | "generator_function" | "generator_function_declaration"
+        )
     };
 }
 

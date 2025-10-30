@@ -636,7 +636,15 @@ impl Cognitive for GleamCode {
     }
 }
 
-implement_metric_trait!(Cognitive, PreprocCode, CcommentCode, KotlinCode, LuaCode, GoCode, CsharpCode);
+implement_metric_trait!(
+    Cognitive,
+    PreprocCode,
+    CcommentCode,
+    KotlinCode,
+    LuaCode,
+    GoCode,
+    CsharpCode
+);
 
 #[cfg(test)]
 mod tests {

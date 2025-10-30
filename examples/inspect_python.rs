@@ -48,12 +48,25 @@ fn print_node(node: &tree_sitter::Node, source: &[u8], depth: usize) {
     if text.is_empty() {
         println!(
             "{}[{}] {} ({}, {}) -> ({}, {})",
-            indent, node.id(), kind, start.row, start.column, end.row, end.column
+            indent,
+            node.id(),
+            kind,
+            start.row,
+            start.column,
+            end.row,
+            end.column
         );
     } else {
         println!(
             "{}[{}] {} ({}, {}) -> ({}, {}): \"{}\"",
-            indent, node.id(), kind, start.row, start.column, end.row, end.column, text
+            indent,
+            node.id(),
+            kind,
+            start.row,
+            start.column,
+            end.row,
+            end.column,
+            text
         );
     }
 

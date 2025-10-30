@@ -771,16 +771,20 @@ mod arrow_function_debug {
 
     #[test]
     fn test_simple_arrow() {
-        check_metrics::<JavascriptParser>(
-            "const x = () => {};",
-            "test.js",
-            |metric| {
-                // Just check if any functions/closures are found
-                println!("Simple arrow: functions={}, closures={}, spaces={}",
-                    metric.nom.functions(), metric.nom.closures(), metric.nom.space_count);
-                assert!(metric.nom.functions() > 0.0 || metric.nom.closures() > 0.0 || metric.nom.space_count > 1,
-                    "Arrow function not recognized at all");
-            },
-        );
+        check_metrics::<JavascriptParser>("const x = () => {};", "test.js", |metric| {
+            // Just check if any functions/closures are found
+            println!(
+                "Simple arrow: functions={}, closures={}, spaces={}",
+                metric.nom.functions(),
+                metric.nom.closures(),
+                metric.nom.space_count
+            );
+            assert!(
+                metric.nom.functions() > 0.0
+                    || metric.nom.closures() > 0.0
+                    || metric.nom.space_count > 1,
+                "Arrow function not recognized at all"
+            );
+        });
     }
 }

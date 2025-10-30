@@ -343,7 +343,15 @@ impl Halstead for GleamCode {
     }
 }
 
-implement_metric_trait!(Halstead, KotlinCode, JavaCode, PreprocCode, CcommentCode, GoCode, CsharpCode);
+implement_metric_trait!(
+    Halstead,
+    KotlinCode,
+    JavaCode,
+    PreprocCode,
+    CcommentCode,
+    GoCode,
+    CsharpCode
+);
 
 #[cfg(test)]
 mod tests {

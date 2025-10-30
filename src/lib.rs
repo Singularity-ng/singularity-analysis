@@ -142,8 +142,11 @@ mod tests {
         );
 
         // Verify Go is in supported languages
-        assert!(analyzer.supported_languages().contains(&LANG::Go),
-                "Go not in supported languages: {:?}", analyzer.supported_languages());
+        assert!(
+            analyzer.supported_languages().contains(&LANG::Go),
+            "Go not in supported languages: {:?}",
+            analyzer.supported_languages()
+        );
     }
 
     #[test]
@@ -166,7 +169,8 @@ mod tests {
 
         // Test basic C# code analysis
         let csharp_code = "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello\");\n    }\n}";
-        let result = analyzer.analyze_language(LANG::Csharp, csharp_code, AnalyzeOptions::default());
+        let result =
+            analyzer.analyze_language(LANG::Csharp, csharp_code, AnalyzeOptions::default());
         assert!(result.is_ok());
     }
 }

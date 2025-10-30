@@ -187,7 +187,7 @@ pub struct KotlinCode;
 pub type MozjsParser = JavascriptParser;
 pub type PreprocParser = CppParser;
 pub type CcommentParser = CppParser;
-pub type KotlinParser = JavaParser;  // Use Java parser as fallback for Kotlin
+pub type KotlinParser = JavaParser; // Use Java parser as fallback for Kotlin
 
 pub(crate) mod fake {
     pub(crate) fn get_true<'a>(ext: &str, mode: &str) -> Option<&'a str> {
