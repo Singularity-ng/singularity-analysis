@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/singularity-code-analysis.svg)](https://crates.io/crates/singularity-code-analysis)
 [![Documentation](https://docs.rs/singularity-code-analysis/badge.svg)](https://docs.rs/singularity-code-analysis)
-[![CI](https://github.com/mikkihugo/singularity-code-analysis/workflows/CI/badge.svg)](https://github.com/mikkihugo/singularity-code-analysis/actions)
+[![CI](https://github.com/mikkhugo/singularity-incubation/workflows/CI/badge.svg)](https://github.com/mikkhugo/singularity-incubation/actions)
 
 **singularity-code-analysis** is a Rust library to analyze and extract information
 from source code written in many different programming languages.
@@ -231,8 +231,8 @@ Contributions are welcome! Please:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mikkihugo/singularity-code-analysis.git
-cd singularity-code-analysis
+git clone https://github.com/mikkhugo/singularity-incubation.git
+cd singularity-incubation/packages/singularity-analysis
 
 # Run tests
 cargo test
