@@ -1,9 +1,7 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # Cachix binary cache configuration
   cachix = {
-    pull = [ "mikkihugo" ];
+    pull = ["mikkihugo"];
     push = "mikkihugo";
   };
 
@@ -30,18 +28,30 @@
         "--all-targets"
         "--all-features"
         "--"
-        "-D" "warnings"
-        "-D" "clippy::all"
-        "-D" "clippy::pedantic"
-        "-D" "clippy::nursery"
-        "-D" "clippy::cargo"
-        "-W" "clippy::restriction"
-        "-A" "clippy::missing_docs_in_private_items"
-        "-A" "clippy::implicit_return"
-        "-A" "clippy::missing_inline_in_public_items"
-        "-A" "clippy::question_mark_used"
-        "-A" "clippy::mod_module_files"
-        "-A" "clippy::self_named_module_files"
+        "-D"
+        "warnings"
+        "-D"
+        "clippy::all"
+        "-D"
+        "clippy::pedantic"
+        "-D"
+        "clippy::nursery"
+        "-D"
+        "clippy::cargo"
+        "-W"
+        "clippy::restriction"
+        "-A"
+        "clippy::missing_docs_in_private_items"
+        "-A"
+        "clippy::implicit_return"
+        "-A"
+        "clippy::missing_inline_in_public_items"
+        "-A"
+        "clippy::question_mark_used"
+        "-A"
+        "clippy::mod_module_files"
+        "-A"
+        "clippy::self_named_module_files"
       ];
     };
 
@@ -53,13 +63,13 @@
     # Dependency linting
     cargo-deny = {
       enable = true;
-      args = [ "check" ];
+      args = ["check"];
     };
 
     # Elixir hooks
     mix-format = {
       enable = true;
-      excludes = [ "deps/" "_build/" ];
+      excludes = ["deps/" "_build/"];
     };
 
     # Credo for Elixir linting
