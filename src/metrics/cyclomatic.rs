@@ -64,7 +64,7 @@ impl fmt::Display for Stats {
 
 impl Stats {
     /// Merges a second `Cyclomatic` metric into the first one
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         // Calculate minimum and maximum values
         self.cyclomatic_max = self.cyclomatic_max.max(other.cyclomatic_max);
         self.cyclomatic_min = self.cyclomatic_min.min(other.cyclomatic_min);
@@ -75,12 +75,12 @@ impl Stats {
 
     /// Returns the `Cyclomatic` metric value
     #[must_use]
-    pub fn cyclomatic(&self) -> f64 {
+    pub const fn cyclomatic(&self) -> f64 {
         self.cyclomatic
     }
     /// Returns the sum
     #[must_use]
-    pub fn cyclomatic_sum(&self) -> f64 {
+    pub const fn cyclomatic_sum(&self) -> f64 {
         self.cyclomatic_sum
     }
 
@@ -94,12 +94,12 @@ impl Stats {
     }
     /// Returns the `Cyclomatic` maximum value
     #[must_use]
-    pub fn cyclomatic_max(&self) -> f64 {
+    pub const fn cyclomatic_max(&self) -> f64 {
         self.cyclomatic_max
     }
     /// Returns the `Cyclomatic` minimum value
     #[must_use]
-    pub fn cyclomatic_min(&self) -> f64 {
+    pub const fn cyclomatic_min(&self) -> f64 {
         self.cyclomatic_min
     }
     #[inline]
@@ -138,10 +138,10 @@ impl Cyclomatic for PythonCode {
             Python::Else => {
                 if node.has_ancestors(
                     |node| {
-                        matches!(
+                        matches! {
                             node.kind_id().into(),
                             Python::ForStatement | Python::WhileStatement
-                        )
+                        }
                     },
                     |node| node.kind_id() == Python::ElseClause,
                 ) {
@@ -357,7 +357,7 @@ impl Cyclomatic for KotlinCode {
             "binary_expression" => {
                 // Handle && and || operators
                 if let Some(operator) = node.child_by_field_name("operator") {
-                    if matches!(operator.kind(), "&&" | "||") {
+                    if matches! {operator.kind(), "&&" | "||"} {
                         stats.cyclomatic += 1.;
                     }
                 }
@@ -380,7 +380,7 @@ impl Cyclomatic for LuaCode {
             "binary_expression" => {
                 // Lua uses 'and'/'or' for boolean operators
                 if let Some(operator) = node.child_by_field_name("operator") {
-                    if matches!(operator.kind(), "and" | "or") {
+                    if matches! {operator.kind(), "and" | "or"} {
                         stats.cyclomatic += 1.;
                     }
                 }
@@ -407,7 +407,7 @@ impl Cyclomatic for GoCode {
             "binary_expression" => {
                 // Handle && and || operators
                 if let Some(operator) = node.child_by_field_name("operator") {
-                    if matches!(operator.kind(), "&&" | "||") {
+                    if matches! {operator.kind(), "&&" | "||"} {
                         stats.cyclomatic += 1.;
                     }
                 }
@@ -438,7 +438,7 @@ impl Cyclomatic for CsharpCode {
             "binary_expression" => {
                 // Handle && and || operators
                 if let Some(operator) = node.child_by_field_name("operator") {
-                    if matches!(operator.kind(), "&&" | "||") {
+                    if matches! {operator.kind(), "&&" | "||"} {
                         stats.cyclomatic += 1.;
                     }
                 }
