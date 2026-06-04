@@ -50,7 +50,7 @@ impl fmt::Display for Stats {
 
 impl Stats {
     #[allow(clippy::unused_self)]
-    pub(crate) fn merge(&mut self, _other: &Stats) {}
+    pub(crate) fn merge(&self, _other: &Self) {}
 
     /// Returns the `Mi` metric calculated using the original formula.
     ///
