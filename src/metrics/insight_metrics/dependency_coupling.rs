@@ -30,7 +30,7 @@ impl DependencyCouplingMetrics {
     /// Calculate coupling score using the formula:
     /// Score = 100 - (
     ///   0.3 * (imports/LOC).clamp(0,10) * 10 +
-    ///   0.25 * cyclic_count +
+    ///   0.25 * `cyclic_count` +
     ///   0.2 * depth.clamp(0,5) * 20 +
     ///   0.15 * violations +
     ///   0.1 * (external/total).clamp(0,1) * 10
