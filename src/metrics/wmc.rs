@@ -121,7 +121,7 @@ impl Stats {
     // Checks if the `Wmc` metric is disabled
     #[inline]
     pub(crate) fn is_disabled(&self) -> bool {
-        matches!(self.space_kind, SpaceKind::Function | SpaceKind::Unknown)
+        matches! {self.space_kind, SpaceKind::Function | SpaceKind::Unknown}
     }
 }
 
@@ -139,7 +139,7 @@ impl Wmc for JavaCode {
                 if stats.space_kind == SpaceKind::Unknown {
                     stats.space_kind = space_kind;
                 }
-                if matches!(space_kind, SpaceKind::Function) {
+                if matches! {space_kind, SpaceKind::Function} {
                     // Saves the cyclomatic complexity of the method
                     stats.cyclomatic = cyclomatic.cyclomatic_sum();
                 }
