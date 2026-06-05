@@ -21,7 +21,11 @@ where
     #[must_use]
     fn get_text_span(node: &Node, code: &[u8], span: bool, text: bool) -> (String, Span) {
         let text = if text {
+<<<<<<< Updated upstream
             String::from_utf8(code[node.start_byte()..node.end_byte()].to_vec()).expect("TODO: Add context for why this shouldn't fail")
+=======
+            String::from_utf8_lossy(&code[node.start_byte()..node.end_byte()]).into_owned()
+>>>>>>> Stashed changes
         } else {
             String::new()
         };
