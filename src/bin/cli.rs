@@ -177,7 +177,7 @@ fn main() -> Result<()> {
             format,
         } => report_command(&path, output, format)?,
         Commands::Compare { path1, path2, diff } => {
-            compare_command(&path1, &path2, diff, cli.format)?
+            compare_command(&path1, &path2, diff, cli.format)?;
         }
     }
 
@@ -308,7 +308,7 @@ fn languages_command(format: OutputFormat) -> Result<()> {
         OutputFormat::Csv => {
             println!("Language,Status,Notes");
             for (lang, status, notes) in &languages {
-                println!("{},{},{}", lang, status, notes);
+                println!("{lang},{status},{notes}");
             }
         }
     }
@@ -326,7 +326,7 @@ fn complexity_command(
         anyhow::bail!("Path does not exist: {}", path.display());
     }
 
-    log::info!("Analyzing complexity (threshold: {})...", threshold);
+    log::info!("Analyzing complexity (threshold: {threshold})...");
 
     // TODO: Implement actual complexity analysis
     let complexities = mock_complexity_data(path, threshold, only_high);
@@ -459,7 +459,7 @@ fn compare_command(path1: &Path, path2: &Path, _diff: bool, format: OutputFormat
         OutputFormat::Csv => {
             println!("Metric,Before,After,Change");
             for (metric, before, after, change) in &comparison {
-                println!("{},{},{},{}", metric, before, after, change);
+                println!("{metric},{before},{after},{change}");
             }
         }
     }
@@ -500,7 +500,7 @@ fn collect_files_single(dir: &Path) -> Result<Vec<PathBuf>> {
 }
 
 fn is_source_file(ext: &str) -> bool {
-    matches!(
+    matches! {
         ext,
         "rs" | "py"
             | "js"
@@ -521,7 +521,7 @@ fn is_source_file(ext: &str) -> bool {
             | "kt"
             | "cs"
             | "lua"
-    )
+    }
 }
 
 fn format_name(format: ReportFormat) -> &'static str {
@@ -687,21 +687,21 @@ fn display_metrics_table(metrics: &MetricsData, filter: Option<MetricType>) {
     table.load_preset(UTF8_FULL);
     table.set_header(vec!["Metric", "Value"]);
 
-    let show_all = filter.is_none() || matches!(filter, Some(MetricType::All));
+    let show_all = filter.is_none() || matches! {filter, Some(MetricType::All)};
 
-    if show_all || matches!(filter, Some(MetricType::Cyclomatic)) {
+    if show_all || matches! {filter, Some(MetricType::Cyclomatic)} {
         table.add_row(vec![
             "Cyclomatic Complexity",
             &metrics.cyclomatic.to_string(),
         ]);
     }
-    if show_all || matches!(filter, Some(MetricType::Cognitive)) {
+    if show_all || matches! {filter, Some(MetricType::Cognitive)} {
         table.add_row(vec!["Cognitive Complexity", &metrics.cognitive.to_string()]);
     }
-    if show_all || matches!(filter, Some(MetricType::Loc)) {
+    if show_all || matches! {filter, Some(MetricType::Loc)} {
         table.add_row(vec!["Lines of Code", &metrics.loc.to_string()]);
     }
-    if show_all || matches!(filter, Some(MetricType::Maintainability)) {
+    if show_all || matches! {filter, Some(MetricType::Maintainability)} {
         table.add_row(vec![
             "Maintainability Index",
             &format!("{:.1}", metrics.maintainability),
@@ -717,20 +717,20 @@ fn display_metrics_json(metrics: &MetricsData, _filter: Option<MetricType>) -> R
 }
 
 fn display_metrics_pretty(metrics: &MetricsData, filter: Option<MetricType>) {
-    let show_all = filter.is_none() || matches!(filter, Some(MetricType::All));
+    let show_all = filter.is_none() || matches! {filter, Some(MetricType::All)};
 
     println!("📊 Code Metrics\n");
 
-    if show_all || matches!(filter, Some(MetricType::Cyclomatic)) {
+    if show_all || matches! {filter, Some(MetricType::Cyclomatic)} {
         println!("  Cyclomatic Complexity: {}", metrics.cyclomatic);
     }
-    if show_all || matches!(filter, Some(MetricType::Cognitive)) {
+    if show_all || matches! {filter, Some(MetricType::Cognitive)} {
         println!("  Cognitive Complexity: {}", metrics.cognitive);
     }
-    if show_all || matches!(filter, Some(MetricType::Loc)) {
+    if show_all || matches! {filter, Some(MetricType::Loc)} {
         println!("  Lines of Code: {}", metrics.loc);
     }
-    if show_all || matches!(filter, Some(MetricType::Maintainability)) {
+    if show_all || matches! {filter, Some(MetricType::Maintainability)} {
         println!("  Maintainability Index: {:.1}", metrics.maintainability);
     }
 }
