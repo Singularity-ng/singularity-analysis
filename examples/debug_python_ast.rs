@@ -1,4 +1,5 @@
 // Debug tool to inspect Python AST structure for boolean operators
+#![allow(clippy::unwrap_used, clippy::expect_used)]
 use tree_sitter::Parser;
 
 fn main() {
