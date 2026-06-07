@@ -71,17 +71,13 @@ fn get_fake_code<T: LanguageInfo>(
     path: &Path,
     pr: Option<Arc<PreprocResults>>,
 ) -> Option<Vec<u8>> {
-    if let Some(pr) = pr {
-        match T::get_lang() {
-            LANG::Cpp => {
-                let macros = get_macros(path, &pr.files);
-                c_macro::replace(code, &macros)
-            }
-            _ => None,
+    pr.and_then(|pr| match T::get_lang() {
+        LANG::Cpp => {
+            let macros = get_macros(path, &pr.files);
+            c_macro::replace(code, &macros)
         }
-    } else {
-        None
-    }
+        _ => None,
+    })
 }
 
 impl<
@@ -121,11 +117,7 @@ impl<
 
     fn new(code: Vec<u8>, path: &Path, pr: Option<Arc<PreprocResults>>) -> Self {
         let fake_code = get_fake_code::<T>(&code, path, pr);
-        let code = if let Some(fake) = fake_code {
-            fake
-        } else {
-            code
-        };
+        let code = fake_code.unwrap_or(code);
 
         let tree = Tree::new::<T>(&code);
 
