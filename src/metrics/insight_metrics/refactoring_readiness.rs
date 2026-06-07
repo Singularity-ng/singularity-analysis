@@ -32,19 +32,19 @@ impl RefactoringReadinessStats {
         let mut score: f64 = 100.0;
 
         // Analyze refactoring factors
-        if self.has_long_functions(code) {
+        if Self::has_long_functions(code) {
             score -= 20.0;
         }
 
-        if self.has_duplicate_code(code) {
+        if Self::has_duplicate_code(code) {
             score -= 15.0;
         }
 
-        if self.has_complex_conditionals(code) {
+        if Self::has_complex_conditionals(code) {
             score -= 10.0;
         }
 
-        if self.has_deep_nesting(code) {
+        if Self::has_deep_nesting(code) {
             score -= 15.0;
         }
 
@@ -52,11 +52,11 @@ impl RefactoringReadinessStats {
         self.readiness_score
     }
 
-    fn has_long_functions(&self, code: &str) -> bool {
+    fn has_long_functions(code: &str) -> bool {
         code.lines().count() > 50
     }
 
-    fn has_duplicate_code(&self, code: &str) -> bool {
+    fn has_duplicate_code(code: &str) -> bool {
         let lines: Vec<&str> = code.lines().collect();
         for i in 0..lines.len() {
             for j in (i + 1)..lines.len() {
@@ -68,11 +68,11 @@ impl RefactoringReadinessStats {
         false
     }
 
-    fn has_complex_conditionals(&self, code: &str) -> bool {
+    fn has_complex_conditionals(code: &str) -> bool {
         code.matches("if").count() > 5
     }
 
-    fn has_deep_nesting(&self, code: &str) -> bool {
+    fn has_deep_nesting(code: &str) -> bool {
         let mut max_nesting = 0;
         let mut current_nesting = 0;
 
