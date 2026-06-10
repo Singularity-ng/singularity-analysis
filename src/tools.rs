@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used)]
+
 use std::{
     cmp::Ordering,
     collections::HashMap,
@@ -30,12 +32,12 @@ use crate::langs::{fake, *};
 /// ```
 pub fn read_file(path: &Path) -> std::io::Result<Vec<u8>> {
     let mut file = File::open(path)?;
-    let mut data = Vec::new();
-    file.read_to_end(&mut data)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
 
-    remove_blank_lines(&mut data);
+    remove_blank_lines(&mut buffer);
 
-    Ok(data)
+    Ok(buffer)
 }
 
 /// Reads a file and adds an `EOL` at its end.
@@ -84,14 +86,14 @@ pub fn read_file_with_eol(path: &Path) -> std::io::Result<Option<Vec<u8>>> {
         return Ok(None);
     }
 
-    let mut data = Vec::with_capacity(file_size + 2);
-    data.extend_from_slice(start);
+    let mut buffer = Vec::with_capacity(file_size + 2);
+    buffer.extend_from_slice(start);
 
-    file.read_to_end(&mut data)?;
+    file.read_to_end(&mut buffer)?;
 
-    remove_blank_lines(&mut data);
+    remove_blank_lines(&mut buffer);
 
-    Ok(Some(data))
+    Ok(Some(buffer))
 }
 
 /// Writes data to a file.
@@ -108,12 +110,12 @@ pub fn read_file_with_eol(path: &Path) -> std::io::Result<Option<Vec<u8>>> {
 /// use singularity_code_analysis::write_file;
 ///
 /// let path = Path::new("foo.txt");
-/// let data: [u8; 4] = [0; 4];
-/// write_file(&path, &data).unwrap();
+/// let content: [u8; 4] = [0; 4];
+/// write_file(&path, &content).unwrap();
 /// ```
-pub fn write_file(path: &Path, data: &[u8]) -> std::io::Result<()> {
+pub fn write_file(path: &Path, content: &[u8]) -> std::io::Result<()> {
     let mut file = File::create(path)?;
-    file.write_all(data)?;
+    file.write_all(content)?;
 
     Ok(())
 }
@@ -137,7 +139,11 @@ pub fn write_file(path: &Path, data: &[u8]) -> std::io::Result<()> {
 /// ```
 pub fn get_language_for_file(path: &Path) -> Option<LANG> {
     if let Some(ext) = path.extension() {
+<<<<<<< Updated upstream
         let ext = ext.to_str().expect("TODO: Add context for why this shouldn't fail").to_lowercase();
+=======
+        let ext = ext.to_str()?.to_lowercase();
+>>>>>>> Stashed changes
         get_from_ext(&ext)
     } else {
         None
@@ -253,16 +259,16 @@ pub fn guess_language<'a, P: AsRef<Path>>(buf: &[u8], path: P) -> (Option<LANG>,
 }
 
 /// Replaces \n and \r ending characters with a single generic \n
-pub(crate) fn remove_blank_lines(data: &mut Vec<u8>) {
-    let count_trailing = data
+pub(crate) fn remove_blank_lines(buffer: &mut Vec<u8>) {
+    let count_trailing = buffer
         .iter()
         .rev()
         .take_while(|&c| *c == b'\n' || *c == b'\r')
         .count();
     if count_trailing > 0 {
-        data.truncate(data.len() - count_trailing);
+        buffer.truncate(buffer.len() - count_trailing);
     }
-    data.push(b'\n');
+    buffer.push(b'\n');
 }
 
 pub(crate) fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
@@ -315,8 +321,13 @@ pub(crate) fn guess_file<S: ::std::hash::BuildHasher>(
         include_path
     };
     let include_path = normalize_path(include_path);
+<<<<<<< Updated upstream
     if let Some(possibilities) = all_files.get(include_path.file_name().expect("TODO: Add context for why this shouldn't fail").to_str().expect("TODO: Add context for why this shouldn't fail"))
     {
+=======
+    let file_name = include_path.file_name().and_then(|n| n.to_str()).unwrap();
+    if let Some(possibilities) = all_files.get(file_name) {
+>>>>>>> Stashed changes
         if possibilities.len() == 1 {
             // Only one file with this name
             return possibilities.clone();
@@ -386,7 +397,7 @@ pub(crate) fn intense_color(stdout: &mut StandardStreamLock, color: Color) -> st
 }
 
 #[cfg(test)]
-pub(crate) fn check_func_space<T: crate::ParserTrait, F: Fn(crate::FuncSpace)>(
+pub fn check_func_space<T: crate::ParserTrait, F: Fn(crate::FuncSpace)>(
     source: &str,
     filename: &str,
     check: F,
@@ -415,7 +426,7 @@ pub(crate) fn check_func_space<T: crate::ParserTrait, F: Fn(crate::FuncSpace)>(
 }
 
 #[cfg(test)]
-pub(crate) fn check_metrics<T: crate::ParserTrait>(
+pub fn check_metrics<T: crate::ParserTrait>(
     source: &str,
     filename: &str,
     check: fn(crate::CodeMetrics) -> (),
@@ -433,7 +444,7 @@ mod tests {
     fn test_read() {
         let tmp_dir = std::env::temp_dir();
         let tmp_path = tmp_dir.join("test_read");
-        let data = vec![
+        let test_cases = vec![
             (b"\xFF\xFEabc".to_vec(), Some(b"abc\n".to_vec())),
             (b"\xFE\xFFabc".to_vec(), Some(b"abc\n".to_vec())),
             (b"\xEF\xBB\xBFabc".to_vec(), Some(b"abc\n".to_vec())),
@@ -442,9 +453,15 @@ mod tests {
             (b"abcdef\n".to_vec(), Some(b"abcdef\n".to_vec())),
             (b"abcdef".to_vec(), Some(b"abcdef\n".to_vec())),
         ];
+<<<<<<< Updated upstream
         for (d, expected) in data {
             write_file(&tmp_path, &d).expect("TODO: Add context for why this shouldn't fail");
             let res = read_file_with_eol(&tmp_path).expect("TODO: Add context for why this shouldn't fail");
+=======
+        for (d, expected) in test_cases {
+            write_file(&tmp_path, &d).unwrap();
+            let res = read_file_with_eol(&tmp_path).unwrap();
+>>>>>>> Stashed changes
             assert_eq!(res, expected);
         }
     }
