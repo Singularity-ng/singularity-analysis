@@ -8,10 +8,10 @@ use std::{
 use serde::Serialize;
 
 #[inline]
-fn f64_to_usize(value: f64) -> usize {
+fn f64_to_usize(n: f64) -> usize {
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     {
-        value as usize
+        n as usize
     }
 }
 
@@ -64,15 +64,15 @@ pub enum SpaceKind {
 impl fmt::Display for SpaceKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            SpaceKind::Unknown => "unknown",
-            SpaceKind::Function => "function",
-            SpaceKind::Class => "class",
-            SpaceKind::Struct => "struct",
-            SpaceKind::Trait => "trait",
-            SpaceKind::Impl => "impl",
-            SpaceKind::Unit => "unit",
-            SpaceKind::Namespace => "namespace",
-            SpaceKind::Interface => "interface",
+            Self::Unknown => "unknown",
+            Self::Function => "function",
+            Self::Class => "class",
+            Self::Struct => "struct",
+            Self::Trait => "trait",
+            Self::Impl => "impl",
+            Self::Unit => "unit",
+            Self::Namespace => "namespace",
+            Self::Interface => "interface",
         };
         write!(f, "{s}")
     }
@@ -123,7 +123,7 @@ impl fmt::Display for CodeMetrics {
 }
 
 impl CodeMetrics {
-    pub fn merge(&mut self, other: &CodeMetrics) {
+    pub fn merge(&mut self, other: &Self) {
         self.cognitive.merge(&other.cognitive);
         self.cyclomatic.merge(&other.cyclomatic);
         self.halstead.merge(&other.halstead);
@@ -243,6 +243,7 @@ fn finalize<T: ParserTrait>(state_stack: &mut Vec<State>, diff_level: usize) {
     }
     for _ in 0..diff_level {
         if state_stack.len() == 1 {
+<<<<<<< Updated upstream
             let last_state = state_stack.last_mut().expect("TODO: Add context for why this shouldn't fail");
             compute_minmax(last_state);
             compute_sum(last_state);
@@ -263,6 +264,30 @@ fn finalize<T: ParserTrait>(state_stack: &mut Vec<State>, diff_level: usize) {
         // Merge function spaces
         last_state.space.metrics.merge(&state.space.metrics);
         last_state.space.spaces.push(state.space);
+=======
+            if let Some(last_state) = state_stack.last_mut() {
+                compute_minmax(last_state);
+                compute_sum(last_state);
+                compute_halstead_mi_and_wmc::<T>(last_state);
+                compute_averages(last_state);
+            }
+            break;
+        }
+        if let Some(mut state) = state_stack.pop() {
+            compute_minmax(&mut state);
+            compute_sum(&mut state);
+            compute_halstead_mi_and_wmc::<T>(&mut state);
+            compute_averages(&mut state);
+
+            if let Some(last_state) = state_stack.last_mut() {
+                last_state.halstead_maps.merge(&state.halstead_maps);
+                compute_halstead_mi_and_wmc::<T>(last_state);
+                // Merge function spaces
+                last_state.space.metrics.merge(&state.space.metrics);
+                last_state.space.spaces.push(state.space);
+            }
+        }
+>>>>>>> Stashed changes
     }
 }
 
