@@ -20,16 +20,16 @@ pub enum AnalyzerError {
 impl fmt::Display for AnalyzerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AnalyzerError::UnsupportedLanguage(lang) => {
+            Self::UnsupportedLanguage(lang) => {
                 write!(
                     f,
                     "language `{lang}` is not supported by Singularity Code Analyzer"
                 )
             }
-            AnalyzerError::AnalysisFailed { language, reason } => {
+            Self::AnalysisFailed { language, reason } => {
                 write!(f, "failed to compute metrics for {language:?}: {reason}")
             }
-            AnalyzerError::Io(err) => write!(f, "failed to read source: {err}"),
+            Self::Io(err) => write!(f, "failed to read source: {err}"),
         }
     }
 }
@@ -37,15 +37,15 @@ impl fmt::Display for AnalyzerError {
 impl std::error::Error for AnalyzerError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            AnalyzerError::Io(err) => Some(err),
+            Self::Io(err) => Some(err),
             _ => None,
         }
     }
 }
 
 impl From<std::io::Error> for AnalyzerError {
-    fn from(value: std::io::Error) -> Self {
-        AnalyzerError::Io(value)
+    fn from(err: std::io::Error) -> Self {
+        Self::Io(err)
     }
 }
 
@@ -61,7 +61,7 @@ pub struct AnalyzerResult {
 impl AnalyzerResult {
     /// Borrow the aggregated metrics for the analyzed space.
     #[must_use]
-    pub fn metrics(&self) -> &crate::spaces::CodeMetrics {
+    pub const fn metrics(&self) -> &crate::spaces::CodeMetrics {
         &self.root_space.metrics
     }
 }
@@ -101,7 +101,7 @@ impl SingularityCodeAnalyzer {
 
     /// Create a new analyzer using a custom parser registry.
     #[must_use]
-    pub fn with_registry(registry: ParserRegistry) -> Self {
+    pub const fn with_registry(registry: ParserRegistry) -> Self {
         Self { registry }
     }
 
@@ -116,8 +116,8 @@ impl SingularityCodeAnalyzer {
     /// Matching is case-insensitive and accepts both enum variants (`"Rust"`)
     /// and display names (`"rust"`).
     #[must_use]
-    pub fn language_from_str(&self, value: &str) -> Option<LANG> {
-        let normalized = value.trim().to_lowercase();
+    pub fn language_from_str(&self, input: &str) -> Option<LANG> {
+        let normalized = input.trim().to_lowercase();
         match normalized.as_str() {
             "js" | "javascript" => return Some(LANG::Javascript),
             "ts" | "typescript" => return Some(LANG::Typescript),
