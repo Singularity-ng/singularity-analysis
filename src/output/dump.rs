@@ -127,7 +127,11 @@ fn dump_tree_helper(
             if let Ok(code) = String::from_utf8(code.to_vec()) {
                 write!(stdout, "{code} ")?;
             } else {
+<<<<<<< Updated upstream
                 stdout.write_all(code).expect("TODO: Add context for why this shouldn't fail");
+=======
+                stdout.write_all(code)?;
+>>>>>>> Stashed changes
             }
         }
 
