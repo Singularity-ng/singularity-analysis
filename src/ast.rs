@@ -73,10 +73,10 @@ impl Serialize for AstNode {
 
 impl AstNode {
     #[must_use]
-    pub fn new(r#type: &'static str, value: String, span: Span, children: Vec<AstNode>) -> Self {
+    pub fn new(r#type: &'static str, content: String, span: Span, children: Vec<Self>) -> Self {
         Self {
             r#type,
-            value,
+            value: content,
             span,
             children,
         }
@@ -97,7 +97,11 @@ fn build<T: ParserTrait>(parser: &T, span: bool, comment: bool) -> Option<AstNod
     // the idea here is to build AstNode from bottom-to-top and from left-to-right.
     // So once we have built the array of children we can build the node itself until the root.
     loop {
+<<<<<<< Updated upstream
         let ts_node = node_stack.last().expect("TODO: Add context for why this shouldn't fail");
+=======
+        let ts_node = node_stack.last()?;
+>>>>>>> Stashed changes
         cursor.reset(ts_node);
         if cursor.goto_first_child() {
             let node = cursor.node();
@@ -105,6 +109,7 @@ fn build<T: ParserTrait>(parser: &T, span: bool, comment: bool) -> Option<AstNod
             node_stack.push(node);
         } else {
             loop {
+<<<<<<< Updated upstream
                 let ts_node = node_stack.pop().expect("TODO: Add context for why this shouldn't fail");
                 if let Some(node) = T::Checker::get_ast_node(
                     &ts_node,
@@ -117,6 +122,19 @@ fn build<T: ParserTrait>(parser: &T, span: bool, comment: bool) -> Option<AstNod
                         return Some(node);
                     }
                     child_stack.last_mut().expect("TODO: Add context for why this shouldn't fail").push(node);
+=======
+                let ts_node = node_stack.pop()?;
+                let children = child_stack.pop()?;
+                if let Some(node) =
+                    T::Checker::get_ast_node(&ts_node, code, children, span, comment)
+                {
+                    if child_stack.is_empty() {
+                        return Some(node);
+                    }
+                    if let Some(parent_children) = child_stack.last_mut() {
+                        parent_children.push(node);
+                    }
+>>>>>>> Stashed changes
                 }
                 if let Some(next_node) = ts_node.next_sibling() {
                     child_stack.push(Vec::with_capacity(next_node.child_count()));
