@@ -26,6 +26,7 @@ pub struct ErrorHandlingMetrics {
     pub log_statements: usize,
 }
 
+#[derive(Clone, Copy)]
 pub struct ErrorHandlingInputs {
     pub error_type_coverage: f64,
     pub unhandled_paths_ratio: f64,
@@ -40,11 +41,11 @@ pub struct ErrorHandlingInputs {
 impl ErrorHandlingMetrics {
     /// Calculate error handling score using weighted formula:
     /// Score = (
-    ///   0.3 * error_type_coverage +
-    ///   0.25 * (1 - unhandled_paths) +
-    ///   0.2 * specific_catches +
-    ///   0.15 * logging_coverage +
-    ///   0.1 * fallback_coverage
+    ///   0.3 * `error_type_coverage` +
+    ///   0.25 * (1 - `unhandled_paths`) +
+    ///   0.2 * `specific_catches` +
+    ///   0.15 * `logging_coverage` +
+    ///   0.1 * `fallback_coverage`
     /// ) * 100
     pub fn calculate(inputs: ErrorHandlingInputs) -> Self {
         let ErrorHandlingInputs {
@@ -103,7 +104,7 @@ impl ErrorHandlingMetrics {
         let if_let_handlers = code.matches("if let ").count();
         let unwrap_calls = code.matches(".unwrap").count();
         let expect_calls = code.matches(".expect").count();
-        let question_marks = code.matches("?").count();
+        let question_marks = code.matches('?').count();
 
         let specific_catches_ratio = (match_handlers + if_let_handlers + question_marks) as f64
             / (error_handlers as f64 + 1.0);
@@ -387,13 +388,13 @@ mod tests {
 
     #[test]
     fn test_generic_catches_detection() {
-        let code = r#"
+        let code = r"
             try {
                 something();
             } catch (e) {
                 console.log(e);
             }
-        "#;
+        ";
 
         let metrics = ErrorHandlingMetrics::analyze_js_errors(code);
         assert!(metrics.generic_catches > 0);
