@@ -108,12 +108,12 @@ impl fmt::Display for Stats {
 
 impl Stats {
     #[inline]
-    fn usize_to_f64(value: usize) -> f64 {
-        value.to_f64().unwrap_or(f64::MAX)
+    fn usize_to_f64(n: usize) -> f64 {
+        n.to_f64().unwrap_or(f64::MAX)
     }
 
     /// Merges a second `Cognitive Complexity` metric into the first one
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         self.structural_min = self.structural_min.min(other.structural_min);
         self.structural_max = self.structural_max.max(other.structural_max);
         self.structural_sum += other.structural_sum;
@@ -156,7 +156,7 @@ impl Stats {
         }
     }
     #[inline]
-    pub(crate) fn compute_sum(&mut self) {
+    pub(crate) const fn compute_sum(&mut self) {
         self.structural_sum += self.structural;
     }
     #[inline]
@@ -166,7 +166,7 @@ impl Stats {
         self.compute_sum();
     }
 
-    pub(crate) fn finalize(&mut self, total_space_functions: usize) {
+    pub(crate) const fn finalize(&mut self, total_space_functions: usize) {
         self.total_space_functions = total_space_functions;
     }
 }
@@ -204,15 +204,15 @@ struct BoolSequence {
 }
 
 impl BoolSequence {
-    fn reset(&mut self) {
+    const fn reset(&mut self) {
         self.boolean_op = None;
     }
 
-    fn not_operator(&mut self, not_id: u16) {
+    const fn not_operator(&mut self, not_id: u16) {
         self.boolean_op = Some(not_id);
     }
 
-    fn eval_based_on_prev(&mut self, bool_id: u16, structural: usize) -> usize {
+    const fn eval_based_on_prev(&mut self, bool_id: u16, structural: usize) -> usize {
         if let Some(prev) = self.boolean_op {
             if prev == bool_id {
                 // The boolean operator is equal to the previous one, so
@@ -228,12 +228,12 @@ impl BoolSequence {
 }
 
 #[inline]
-fn increment(stats: &mut Stats) {
+const fn increment(stats: &mut Stats) {
     stats.structural += stats.nesting + 1;
 }
 
 #[inline]
-fn increment_by_one(stats: &mut Stats) {
+const fn increment_by_one(stats: &mut Stats) {
     stats.structural += 1;
 }
 
@@ -241,12 +241,18 @@ fn get_nesting_from_map(
     node: &Node,
     nesting_map: &HashMap<usize, (usize, usize, usize)>,
 ) -> (usize, usize, usize) {
+<<<<<<< Updated upstream
     if let Some(parent) = node.parent() {
         if let Some(n) = nesting_map.get(&parent.id()) {
             return *n;
         }
     }
     (0, 0, 0)
+=======
+    node.parent().map_or((0, 0, 0), |parent| {
+        nesting_map.get(&parent.id()).copied().unwrap_or((0, 0, 0))
+    })
+>>>>>>> Stashed changes
 }
 
 fn increment_function_depth<T: std::cmp::PartialEq + std::convert::From<u16>>(
@@ -266,7 +272,7 @@ fn increment_function_depth<T: std::cmp::PartialEq + std::convert::From<u16>>(
 }
 
 #[inline]
-fn increase_nesting(stats: &mut Stats, nesting: &mut usize, depth: usize, lambda: usize) {
+const fn increase_nesting(stats: &mut Stats, nesting: &mut usize, depth: usize, lambda: usize) {
     stats.nesting = *nesting + depth + lambda;
     increment(stats);
     *nesting += 1;
@@ -328,13 +334,13 @@ impl Cognitive for PythonCode {
                     stats.structural += node.count_specific_ancestors::<PythonParser>(
                         |node| node.kind_id() == Python::Lambda,
                         |node| {
-                            matches!(
+                            matches! {
                                 node.kind_id().into(),
                                 Python::ExpressionList
                                     | Python::IfStatement
                                     | Python::ForStatement
                                     | Python::WhileStatement
-                            )
+                            }
                         },
                     );
                 }
@@ -388,7 +394,7 @@ impl Cognitive for RustCode {
             }
             Rust::BreakExpression | Rust::ContinueExpression => {
                 if let Some(label_child) = node.child(1) {
-                    if let Rust::Label = label_child.kind_id().into() {
+                    if label_child.kind_id() == Rust::Label {
                         increment_by_one(stats);
                     }
                 }
