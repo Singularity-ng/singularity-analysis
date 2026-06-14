@@ -32,10 +32,10 @@ impl TestabilityScoreStats {
         let mut total_weight = 0.0;
 
         // Analyze various testability factors
-        let modularity = self.analyze_modularity(code);
-        let dependency_injection = self.analyze_dependency_injection(code);
-        let pure_functions = self.analyze_pure_functions(code);
-        let error_handling = self.analyze_error_handling(code);
+        let modularity = Self::analyze_modularity(code);
+        let dependency_injection = Self::analyze_dependency_injection(code);
+        let pure_functions = Self::analyze_pure_functions(code);
+        let error_handling = Self::analyze_error_handling(code);
 
         self.testability_factors = vec![
             TestabilityFactor {
@@ -74,7 +74,7 @@ impl TestabilityScoreStats {
         self.testability_score
     }
 
-    fn analyze_modularity(&self, code: &str) -> f64 {
+    fn analyze_modularity(code: &str) -> f64 {
         let mut score: f64 = 0.0;
 
         // Check for function/module structure
@@ -96,14 +96,14 @@ impl TestabilityScoreStats {
         }
 
         // Check for single responsibility
-        if self.has_single_responsibility(code) {
+        if Self::has_single_responsibility(code) {
             score += 25.0;
         }
 
         score.min(100.0_f64)
     }
 
-    fn analyze_dependency_injection(&self, code: &str) -> f64 {
+    fn analyze_dependency_injection(code: &str) -> f64 {
         let mut score: f64 = 0.0;
 
         // Check for constructor injection
@@ -129,11 +129,11 @@ impl TestabilityScoreStats {
         score.min(100.0_f64)
     }
 
-    fn analyze_pure_functions(&self, code: &str) -> f64 {
+    fn analyze_pure_functions(code: &str) -> f64 {
         let mut score: f64 = 0.0;
 
         // Check for functions without side effects
-        if self.has_pure_functions(code) {
+        if Self::has_pure_functions(code) {
             score += 40.0;
         }
 
@@ -150,7 +150,7 @@ impl TestabilityScoreStats {
         score.min(100.0_f64)
     }
 
-    fn analyze_error_handling(&self, code: &str) -> f64 {
+    fn analyze_error_handling(code: &str) -> f64 {
         let mut score: f64 = 0.0;
 
         // Check for proper error handling
@@ -163,7 +163,7 @@ impl TestabilityScoreStats {
         }
 
         // Check for error propagation
-        if code.contains("?") || code.contains("unwrap") || code.contains("expect") {
+        if code.contains('?') || code.contains("unwrap") || code.contains("expect") {
             score += 30.0;
         }
 
@@ -175,7 +175,7 @@ impl TestabilityScoreStats {
         score.min(100.0_f64)
     }
 
-    fn has_single_responsibility(&self, code: &str) -> bool {
+    fn has_single_responsibility(code: &str) -> bool {
         // Simple heuristic: check for focused function names
         let function_keywords = ["calculate", "validate", "process", "format", "parse"];
         function_keywords
@@ -183,7 +183,7 @@ impl TestabilityScoreStats {
             .any(|keyword| code.to_lowercase().contains(keyword))
     }
 
-    fn has_pure_functions(&self, code: &str) -> bool {
+    fn has_pure_functions(code: &str) -> bool {
         // Simple heuristic: check for functions without side effects
         !code.contains("print") && !code.contains("log") && !code.contains("write")
     }
