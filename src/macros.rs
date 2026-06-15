@@ -66,7 +66,11 @@ macro_rules! implement_metric_trait {
 macro_rules! mk_lang {
     ( $( ($camel:ident, $name:ident, $display: expr, $description:expr) ),* ) => {
         /// The list of supported languages.
+<<<<<<< Updated upstream
         #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+=======
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+>>>>>>> Stashed changes
         pub enum LANG {
             $(
                 #[doc = $description]
