@@ -6,10 +6,10 @@ use crate::langs::LANG;
 
 #[inline]
 #[must_use]
-fn usize_to_f64(value: usize) -> f64 {
+fn usize_to_f64(n: usize) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f64
+        n as f64
     }
 }
 
