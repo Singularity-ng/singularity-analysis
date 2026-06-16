@@ -32,10 +32,10 @@ impl CompositeCodeQualityStats {
         let mut total_weight = 0.0;
 
         // Analyze various quality factors
-        let readability = self.analyze_readability(code);
-        let maintainability = self.analyze_maintainability(code);
-        let performance = self.analyze_performance(code);
-        let security = self.analyze_security(code);
+        let readability = Self::analyze_readability(code);
+        let maintainability = Self::analyze_maintainability(code);
+        let performance = Self::analyze_performance(code);
+        let security = Self::analyze_security(code);
 
         self.quality_factors = vec![
             QualityFactor {
@@ -74,95 +74,95 @@ impl CompositeCodeQualityStats {
         self.quality_score
     }
 
-    fn analyze_readability(&self, code: &str) -> f64 {
+    fn analyze_readability(code: &str) -> f64 {
         let mut score: f64 = 100.0;
 
         // Check for clear naming
-        if self.has_clear_naming(code) {
+        if Self::has_clear_naming(code) {
             score += 10.0;
         }
 
         // Check for appropriate comments
-        if self.has_good_comments(code) {
+        if Self::has_good_comments(code) {
             score += 15.0;
         }
 
         // Check for consistent formatting
-        if self.has_consistent_formatting(code) {
+        if Self::has_consistent_formatting(code) {
             score += 10.0;
         }
 
         score.min(100.0_f64)
     }
 
-    fn analyze_maintainability(&self, code: &str) -> f64 {
+    fn analyze_maintainability(code: &str) -> f64 {
         let mut score: f64 = 100.0;
 
         // Check for modular structure
-        if self.has_modular_structure(code) {
+        if Self::has_modular_structure(code) {
             score += 20.0;
         }
 
         // Check for low coupling
-        if self.has_low_coupling(code) {
+        if Self::has_low_coupling(code) {
             score += 15.0;
         }
 
         // Check for high cohesion
-        if self.has_high_cohesion(code) {
+        if Self::has_high_cohesion(code) {
             score += 15.0;
         }
 
         score.min(100.0_f64)
     }
 
-    fn analyze_performance(&self, code: &str) -> f64 {
+    fn analyze_performance(code: &str) -> f64 {
         let mut score: f64 = 100.0;
 
         // Check for efficient algorithms
-        if self.has_efficient_algorithms(code) {
+        if Self::has_efficient_algorithms(code) {
             score += 20.0;
         }
 
         // Check for proper resource management
-        if self.has_proper_resource_management(code) {
+        if Self::has_proper_resource_management(code) {
             score += 15.0;
         }
 
         score.min(100.0_f64)
     }
 
-    fn analyze_security(&self, code: &str) -> f64 {
+    fn analyze_security(code: &str) -> f64 {
         let mut score: f64 = 100.0;
 
         // Check for input validation
-        if self.has_input_validation(code) {
+        if Self::has_input_validation(code) {
             score += 25.0;
         }
 
         // Check for secure coding practices
-        if self.has_secure_practices(code) {
+        if Self::has_secure_practices(code) {
             score += 20.0;
         }
 
         score.min(100.0_f64)
     }
 
-    fn has_clear_naming(&self, code: &str) -> bool {
+    fn has_clear_naming(code: &str) -> bool {
         // Simple heuristic: check for descriptive variable names
         code.contains("user") || code.contains("order") || code.contains("result")
     }
 
-    fn has_good_comments(&self, code: &str) -> bool {
+    fn has_good_comments(code: &str) -> bool {
         let comment_lines = code
             .lines()
-            .filter(|line| line.trim().starts_with("//") || line.trim().starts_with("#"))
+            .filter(|line| line.trim().starts_with("//") || line.trim().starts_with('#'))
             .count();
         let total_lines = code.lines().count();
         comment_lines as f64 / total_lines as f64 > 0.1
     }
 
-    fn has_consistent_formatting(&self, code: &str) -> bool {
+    fn has_consistent_formatting(code: &str) -> bool {
         // Simple heuristic: check for consistent indentation
         let lines: Vec<&str> = code.lines().collect();
         if lines.is_empty() {
@@ -176,35 +176,35 @@ impl CompositeCodeQualityStats {
         })
     }
 
-    fn has_modular_structure(&self, code: &str) -> bool {
+    fn has_modular_structure(code: &str) -> bool {
         code.contains("fn ") || code.contains("def ") || code.contains("function ")
     }
 
-    fn has_low_coupling(&self, code: &str) -> bool {
+    fn has_low_coupling(code: &str) -> bool {
         // Simple heuristic: fewer external dependencies
         code.matches("import").count() < 10
     }
 
-    fn has_high_cohesion(&self, code: &str) -> bool {
+    fn has_high_cohesion(code: &str) -> bool {
         // Simple heuristic: related functionality grouped together
         code.lines().count() < 100
     }
 
-    fn has_efficient_algorithms(&self, code: &str) -> bool {
+    fn has_efficient_algorithms(code: &str) -> bool {
         // Simple heuristic: check for efficient patterns
         !code.contains("O(n^2)") && !code.contains("nested loop")
     }
 
-    fn has_proper_resource_management(&self, code: &str) -> bool {
+    fn has_proper_resource_management(code: &str) -> bool {
         // Simple heuristic: check for proper cleanup
         code.contains("close") || code.contains("dispose") || code.contains("free")
     }
 
-    fn has_input_validation(&self, code: &str) -> bool {
+    fn has_input_validation(code: &str) -> bool {
         code.contains("validate") || code.contains("check") || code.contains("assert")
     }
 
-    fn has_secure_practices(&self, code: &str) -> bool {
+    fn has_secure_practices(code: &str) -> bool {
         !code.contains("password") || code.contains("hash") || code.contains("encrypt")
     }
 }
