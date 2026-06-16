@@ -14,16 +14,16 @@ macro_rules! check_if_func {
     ($parser: ident, $node: ident) => {
         $node.count_specific_ancestors::<$parser>(
             |node| {
-                matches!(
+                matches! {
                     node.kind_id().into(),
                     VariableDeclarator | AssignmentExpression | LabeledStatement | Pair
-                )
+                }
             },
             |node| {
-                matches!(
+                matches! {
                     node.kind_id().into(),
                     StatementBlock | ReturnStatement | NewExpression | Arguments
-                )
+                }
             },
         ) > 0
             || $node.is_child(Identifier as u16)
@@ -32,19 +32,19 @@ macro_rules! check_if_func {
 
 macro_rules! is_js_func {
     ($parser: ident, $node: ident) => {
-        matches!(
+        matches! {
             $node.kind(),
             "function_declaration" | "method_definition" | "function_expression"
-        )
+        }
     };
 }
 
 macro_rules! is_js_closure {
     ($parser: ident, $node: ident) => {
-        matches!(
+        matches! {
             $node.kind(),
             "arrow_function" | "generator_function" | "generator_function_declaration"
-        )
+        }
     };
 }
 
@@ -65,7 +65,15 @@ macro_rules! is_js_func_and_closure_checker {
 #[inline]
 fn get_aho_corasick_match(code: &[u8]) -> bool {
     AHO_CORASICK
+<<<<<<< Updated upstream
         .get_or_init(|| AhoCorasick::new(vec![b"<div rustbindgen"]).expect("TODO: Add context for why this shouldn't fail"))
+=======
+        .get_or_init(|| {
+            // SAFETY: This pattern is a valid hardcoded string literal
+            AhoCorasick::new(vec![b"<div rustbindgen"])
+                .unwrap_or_else(|_| unreachable!("Hardcoded pattern is always valid"))
+        })
+>>>>>>> Stashed changes
         .is_match(code)
 }
 
@@ -116,7 +124,7 @@ impl Checker for PreprocCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string_literal" | "raw_string_literal")
+        matches! {node.kind(), "string_literal" | "raw_string_literal"}
     }
 
     fn is_else_if(_: &Node) -> bool {
@@ -158,7 +166,7 @@ impl Checker for CcommentCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string_literal" | "raw_string_literal")
+        matches! {node.kind(), "string_literal" | "raw_string_literal"}
     }
 
     fn is_else_if(_: &Node) -> bool {
@@ -180,14 +188,14 @@ impl Checker for CppCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "translation_unit"
                 | "function_definition"
                 | "struct_specifier"
                 | "class_specifier"
                 | "namespace_definition"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
@@ -203,14 +211,14 @@ impl Checker for CppCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "string_literal" | "concatenated_string" | "raw_string_literal"
-        )
+        }
     }
 
     fn is_else_if(node: &Node) -> bool {
@@ -241,16 +249,22 @@ impl Checker for PythonCode {
         node.start_row() <= 1
             && RE
                 .get_or_init(|| {
+<<<<<<< Updated upstream
                     Regex::new(r"^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)").expect("TODO: Add context for why this shouldn't fail")
+=======
+                    // SAFETY: This is a valid hardcoded regex pattern
+                    Regex::new(r"^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)")
+                        .unwrap_or_else(|_| unreachable!("Hardcoded regex pattern is always valid"))
+>>>>>>> Stashed changes
                 })
                 .is_match(&code[node.start_byte()..node.end_byte()])
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "module" | "function_definition" | "class_definition"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
@@ -266,7 +280,7 @@ impl Checker for PythonCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
@@ -284,7 +298,7 @@ impl Checker for PythonCode {
 
 impl Checker for JavaCode {
     fn is_comment(node: &Node) -> bool {
-        matches!(node.kind(), "line_comment" | "block_comment")
+        matches! {node.kind(), "line_comment" | "block_comment"}
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
@@ -292,17 +306,17 @@ impl Checker for JavaCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "program" | "class_declaration" | "interface_declaration"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "method_declaration" | "constructor_declaration"
-        )
+        }
     }
 
     fn is_closure(node: &Node) -> bool {
@@ -340,7 +354,7 @@ impl Checker for MozjsCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "program"
                 | "function_expression"
@@ -351,7 +365,7 @@ impl Checker for MozjsCode {
                 | "generator_function_declaration"
                 | "class_declaration"
                 | "arrow_function"
-        )
+        }
     }
 
     is_js_func_and_closure_checker!(MozjsParser, Mozjs);
@@ -361,7 +375,7 @@ impl Checker for MozjsCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
@@ -394,7 +408,7 @@ impl Checker for JavascriptCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "program"
                 | "function_expression"
@@ -405,7 +419,7 @@ impl Checker for JavascriptCode {
                 | "generator_function_declaration"
                 | "class_declaration"
                 | "arrow_function"
-        )
+        }
     }
 
     is_js_func_and_closure_checker!(JavascriptParser, Javascript);
@@ -415,7 +429,7 @@ impl Checker for JavascriptCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
@@ -448,7 +462,7 @@ impl Checker for TypescriptCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "program"
                 | "function_expression"
@@ -460,7 +474,7 @@ impl Checker for TypescriptCode {
                 | "class_declaration"
                 | "interface_declaration"
                 | "arrow_function"
-        )
+        }
     }
 
     is_js_func_and_closure_checker!(TypescriptParser, Typescript);
@@ -470,7 +484,7 @@ impl Checker for TypescriptCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
@@ -504,7 +518,7 @@ impl Checker for TsxCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "program"
                 | "function_expression"
@@ -516,7 +530,7 @@ impl Checker for TsxCode {
                 | "class_declaration"
                 | "interface_declaration"
                 | "arrow_function"
-        )
+        }
     }
 
     is_js_func_and_closure_checker!(TsxParser, Tsx);
@@ -526,7 +540,7 @@ impl Checker for TsxCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")")
+        matches! {node.kind(), "(" | "," | ")"}
     }
 
     fn is_string(node: &Node) -> bool {
@@ -551,7 +565,7 @@ impl Checker for TsxCode {
 
 impl Checker for RustCode {
     fn is_comment(node: &Node) -> bool {
-        matches!(node.kind(), "line_comment" | "block_comment")
+        matches! {node.kind(), "line_comment" | "block_comment"}
     }
 
     fn is_useful_comment(node: &Node, code: &[u8]) -> bool {
@@ -566,10 +580,10 @@ impl Checker for RustCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "source_file" | "function_item" | "impl_item" | "trait_item" | "closure_expression"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
@@ -585,11 +599,11 @@ impl Checker for RustCode {
     }
 
     fn is_non_arg(node: &Node) -> bool {
-        matches!(node.kind(), "(" | "," | ")" | "|" | "attribute_item")
+        matches! {node.kind(), "(" | "," | ")" | "|" | "attribute_item"}
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string_literal" | "raw_string_literal")
+        matches! {node.kind(), "string_literal" | "raw_string_literal"}
     }
 
     #[inline]
@@ -612,7 +626,7 @@ impl Checker for RustCode {
 // Kotlin implementation - based on tree-sitter-kotlin (currently disabled due to API differences)
 impl Checker for KotlinCode {
     fn is_comment(node: &Node) -> bool {
-        matches!(node.kind(), "line_comment" | "block_comment")
+        matches! {node.kind(), "line_comment" | "block_comment"}
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
@@ -620,14 +634,14 @@ impl Checker for KotlinCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "source_file"
                 | "class_declaration"
                 | "function_declaration"
                 | "lambda_literal"
                 | "anonymous_function"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
@@ -635,7 +649,7 @@ impl Checker for KotlinCode {
     }
 
     fn is_closure(node: &Node) -> bool {
-        matches!(node.kind(), "lambda_literal" | "anonymous_function")
+        matches! {node.kind(), "lambda_literal" | "anonymous_function"}
     }
 
     fn is_call(node: &Node) -> bool {
@@ -647,7 +661,7 @@ impl Checker for KotlinCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string_literal" | "multiline_string_literal")
+        matches! {node.kind(), "string_literal" | "multiline_string_literal"}
     }
 
     fn is_else_if(_: &Node) -> bool {
@@ -674,7 +688,7 @@ impl Checker for ElixirCode {
 
     fn is_func_space(node: &Node) -> bool {
         // Elixir function spaces: source file, do blocks (which contain functions)
-        matches!(node.kind(), "source" | "do_block" | "anonymous_function")
+        matches! {node.kind(), "source" | "do_block" | "anonymous_function"}
     }
 
     fn is_func(node: &Node) -> bool {
@@ -706,7 +720,7 @@ impl Checker for ElixirCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string" | "charlist" | "quoted_content")
+        matches! {node.kind(), "string" | "charlist" | "quoted_content"}
     }
 
     fn is_else_if(_node: &Node) -> bool {
@@ -716,10 +730,10 @@ impl Checker for ElixirCode {
 
     fn is_primitive(kind_id: u16) -> bool {
         // Elixir primitives: atoms, integers, floats, booleans, nil
-        matches!(
+        matches! {
             kind_id.into(),
             Elixir::Atom | Elixir::Integer | Elixir::Float | Elixir::Boolean | Elixir::Nil
-        )
+        }
     }
 }
 
@@ -736,15 +750,15 @@ impl Checker for ErlangCode {
 
     fn is_func_space(node: &Node) -> bool {
         // Erlang function spaces: source file, function declarations, anonymous functions
-        matches!(
+        matches! {
             node.kind(),
             "source_file" | "fun_decl" | "function_clause" | "anonymous_fun" | "clause_body"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
         // Erlang function declarations
-        matches!(node.kind(), "fun_decl" | "function_clause")
+        matches! {node.kind(), "fun_decl" | "function_clause"}
     }
 
     fn is_closure(node: &Node) -> bool {
@@ -775,20 +789,20 @@ impl Checker for ErlangCode {
 
     fn is_primitive(kind_id: u16) -> bool {
         // Erlang primitives: atoms, integers, floats, vars
-        matches!(
+        matches! {
             kind_id.into(),
             Erlang::Atom | Erlang::Integer | Erlang::Float
-        )
+        }
     }
 }
 
 // Gleam implementation - based on tree-sitter-gleam 1.0.0
 impl Checker for GleamCode {
     fn is_comment(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "comment" | "module_comment" | "statement_comment"
-        )
+        }
     }
 
     fn is_useful_comment(_: &Node, _: &[u8]) -> bool {
@@ -798,10 +812,10 @@ impl Checker for GleamCode {
 
     fn is_func_space(node: &Node) -> bool {
         // Gleam function spaces: source file, functions, anonymous functions, blocks
-        matches!(
+        matches! {
             node.kind(),
             "source_file" | "function" | "anonymous_function" | "function_body" | "block"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
@@ -825,7 +839,7 @@ impl Checker for GleamCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(node.kind(), "string" | "quoted_content")
+        matches! {node.kind(), "string" | "quoted_content"}
     }
 
     fn is_else_if(_node: &Node) -> bool {
@@ -835,7 +849,7 @@ impl Checker for GleamCode {
 
     fn is_primitive(kind_id: u16) -> bool {
         // Gleam primitives: integers, floats
-        matches!(kind_id.into(), Gleam::Integer | Gleam::Float)
+        matches! {kind_id.into(), Gleam::Integer | Gleam::Float}
     }
 }
 
@@ -851,15 +865,15 @@ impl Checker for LuaCode {
 
     fn is_func_space(node: &Node) -> bool {
         // Lua function spaces: program (top-level), function declarations, function definitions
-        matches!(
+        matches! {
             node.kind(),
             "program" | "function_declaration" | "function_definition" | "function"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
         // Lua function declarations and definitions
-        matches!(node.kind(), "function_declaration" | "function_definition")
+        matches! {node.kind(), "function_declaration" | "function_definition"}
     }
 
     fn is_closure(node: &Node) -> bool {
@@ -887,10 +901,10 @@ impl Checker for LuaCode {
 
     fn is_primitive(kind_id: u16) -> bool {
         // Lua primitives: numbers, strings, booleans, nil
-        matches!(
+        matches! {
             kind_id.into(),
             Lua::Number | Lua::String | Lua::True | Lua::False | Lua::Nil
-        )
+        }
     }
 }
 
@@ -905,14 +919,14 @@ impl Checker for GoCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "source_file" | "function_declaration" | "method_declaration" | "func_literal"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
-        matches!(node.kind(), "function_declaration" | "method_declaration")
+        matches! {node.kind(), "function_declaration" | "method_declaration"}
     }
 
     fn is_closure(node: &Node) -> bool {
@@ -928,10 +942,10 @@ impl Checker for GoCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "interpreted_string_literal" | "raw_string_literal"
-        )
+        }
     }
 
     fn is_else_if(_: &Node) -> bool {
@@ -954,28 +968,28 @@ impl Checker for CsharpCode {
     }
 
     fn is_func_space(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "compilation_unit"
                 | "class_declaration"
                 | "struct_declaration"
                 | "interface_declaration"
                 | "record_declaration"
-        )
+        }
     }
 
     fn is_func(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "method_declaration" | "constructor_declaration"
-        )
+        }
     }
 
     fn is_closure(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "lambda_expression" | "anonymous_method_expression"
-        )
+        }
     }
 
     fn is_call(node: &Node) -> bool {
@@ -987,10 +1001,10 @@ impl Checker for CsharpCode {
     }
 
     fn is_string(node: &Node) -> bool {
-        matches!(
+        matches! {
             node.kind(),
             "string_literal" | "interpolated_string_expression"
-        )
+        }
     }
 
     fn is_else_if(_: &Node) -> bool {
