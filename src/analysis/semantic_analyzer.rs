@@ -8,18 +8,18 @@ use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, collections::HashMap};
 
 #[inline]
-fn usize_to_f32(value: usize) -> f32 {
+fn usize_to_f32(n: usize) -> f32 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f32
+        n as f32
     }
 }
 
 #[inline]
-fn u32_to_f32(value: u32) -> f32 {
+fn u32_to_f32(n: u32) -> f32 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f32
+        n as f32
     }
 }
 
