@@ -28,7 +28,11 @@ pub fn replace<S: ::std::hash::BuildHasher>(
         if k_start != 0 && !is_identifier_part(*c) {
             let start = k_start - 1;
                 k_start = 0;
+<<<<<<< Updated upstream
                 let keyword = String::from_utf8(code[start..i].to_vec()).expect("TODO: Add context for why this shouldn't fail");
+=======
+                let keyword = String::from_utf8_lossy(&code[start..i]);
+>>>>>>> Stashed changes
                 if is_macro(&keyword, macros) {
                     new_code.extend(&code[code_start..start]);
                     new_code.extend(&DOLLARS[..(i - start)]);
@@ -42,7 +46,11 @@ pub fn replace<S: ::std::hash::BuildHasher>(
     if k_start != 0 {
         let start = k_start - 1;
         let i = code.len();
+<<<<<<< Updated upstream
         let keyword = String::from_utf8(code[start..].to_vec()).expect("TODO: Add context for why this shouldn't fail");
+=======
+        let keyword = String::from_utf8_lossy(&code[start..]);
+>>>>>>> Stashed changes
         if is_macro(&keyword, macros) {
             new_code.extend(&code[code_start..start]);
             new_code.extend(&DOLLARS[..(i - start)]);
