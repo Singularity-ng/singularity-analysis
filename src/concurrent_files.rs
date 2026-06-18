@@ -17,8 +17,9 @@ type ProcDirPathsFunction<Config> =
 type ProcPathFunction<Config> = dyn Fn(&Path, &Config) + Send + Sync;
 
 // Null functions removed at compile time
-fn null_proc_dir_paths<Config>(_: &mut HashMap<String, Vec<PathBuf>>, _: &Path, _: &Config) {}
-fn null_proc_path<Config>(_: &Path, _: &Config) {}
+const fn null_proc_dir_paths<Config>(_: &mut HashMap<String, Vec<PathBuf>>, _: &Path, _: &Config) {}
+
+const fn null_proc_path<Config>(_: &Path, _: &Config) {}
 
 #[derive(Debug)]
 struct JobItem<Config> {
@@ -35,15 +36,23 @@ where
     ProcFiles: Fn(PathBuf, &Config) -> std::io::Result<()> + Send + Sync,
 {
     while let Ok(job) = receiver.recv() {
+<<<<<<< Updated upstream
         if job.is_none() {
             break;
         }
         // Cannot panic because of the check immediately above.
         let job = job.expect("TODO: Add context for why this shouldn't fail");
         let path = job.path.clone();
+=======
+        if let Some(job) = job {
+            let path = job.path.clone();
+>>>>>>> Stashed changes
 
-        if let Err(err) = func(job.path, &job.cfg) {
-            eprintln!("{err:?} for file {}", path.display());
+            if let Err(err) = func(job.path, &job.cfg) {
+                eprintln!("{err:?} for file {}", path.display());
+            }
+        } else {
+            break;
         }
     }
 }
