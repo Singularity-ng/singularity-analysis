@@ -1,10 +1,17 @@
 /// Inspects Elixir tree-sitter node types to help build proper language enum
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 use tree_sitter::Parser;
 
 fn main() {
     let language = tree_sitter_elixir::LANGUAGE.into();
     let mut parser = Parser::new();
+<<<<<<< Updated upstream
     parser.set_language(&language).expect("TODO: Add context for why this shouldn't fail");
+=======
+    parser
+        .set_language(&language)
+        .expect("Failed to set language");
+>>>>>>> Stashed changes
 
     let source_code = r#"
 defmodule Example do
@@ -31,7 +38,13 @@ defmodule Example do
 end
 "#;
 
+<<<<<<< Updated upstream
     let tree = parser.parse(source_code, None).expect("TODO: Add context for why this shouldn't fail");
+=======
+    let tree = parser
+        .parse(source_code, None)
+        .expect("Failed to parse source code");
+>>>>>>> Stashed changes
     let root = tree.root_node();
 
     println!("=== Elixir Tree-Sitter Node Types ===\n");
