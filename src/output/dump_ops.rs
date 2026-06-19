@@ -100,6 +100,10 @@ fn dump_ops_values(
     last: bool,
     stdout: &mut StandardStreamLock,
 ) -> std::io::Result<()> {
+    if ops.is_empty() {
+        return Ok(());
+    }
+
     let (pref_child, pref) = if last { ("   ", "`- ") } else { ("|  ", "|- ") };
 
     color(stdout, Color::Blue)?;
@@ -121,5 +125,9 @@ fn dump_ops_values(
     write!(stdout, "{prefix}`- ")?;
 
     color(stdout, Color::White)?;
-    writeln!(stdout, "{}", ops.last().unwrap())
+    if let Some(last_op) = ops.last() {
+        writeln!(stdout, "{last_op}")?;
+    }
+
+    Ok(())
 }
