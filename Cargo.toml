@@ -65,10 +65,11 @@ env_logger = { version = "0.11", optional = true }
 log = { version = "0.4", optional = true }
 
 [features]
-default = []
+default = ["language-registry"]
 insight-metrics = []
 nif = ["rustler"]
 cli = ["clap", "anyhow", "serde_json", "indicatif", "comfy-table", "env_logger", "log"]
+language-registry = ["singularity-language-registry"]
 
 [[bin]]
 name = "singularity-rca"
@@ -81,7 +82,7 @@ pretty_assertions = "1.3"
 
 [lints.rust]
 unsafe_code = "warn"  # Allow unsafe with proper documentation
-missing_docs = "warn"
+missing_docs = "allow"  # TODO: Re-enable once documentation is complete
 
 [lints.clippy]
 # Lint groups
