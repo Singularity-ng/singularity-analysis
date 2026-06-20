@@ -1,5 +1,6 @@
 use std::{path::Path, sync::Arc};
 
+use serde::{Deserialize, Serialize};
 use tree_sitter::Language;
 
 use crate::{
