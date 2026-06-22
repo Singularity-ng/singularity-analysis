@@ -1,10 +1,17 @@
 /// Inspects Gleam tree-sitter node types
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 use tree_sitter::Parser;
 
 fn main() {
     let language = tree_sitter_gleam::LANGUAGE.into();
     let mut parser = Parser::new();
+<<<<<<< Updated upstream
     parser.set_language(&language).expect("TODO: Add context for why this shouldn't fail");
+=======
+    parser
+        .set_language(&language)
+        .expect("Failed to set language");
+>>>>>>> Stashed changes
 
     let source_code = r#"
 import gleam/io
@@ -29,7 +36,13 @@ fn private_function(x: Int) -> String {
 }
 "#;
 
+<<<<<<< Updated upstream
     let tree = parser.parse(source_code, None).expect("TODO: Add context for why this shouldn't fail");
+=======
+    let tree = parser
+        .parse(source_code, None)
+        .expect("Failed to parse source code");
+>>>>>>> Stashed changes
     let root = tree.root_node();
 
     println!("=== Gleam Tree-Sitter Node Types ===\n");
@@ -39,7 +52,7 @@ fn private_function(x: Int) -> String {
     for i in 0..language.node_kind_count() {
         if language.node_kind_is_named(i as u16) {
             if let Some(kind) = language.node_kind_for_id(i as u16) {
-                println!("{:3}: {}", i, kind);
+                println!("{i:3}: {kind}");
             }
         }
     }
@@ -59,9 +72,9 @@ fn print_node(node: &tree_sitter::Node, source: &[u8], depth: usize) {
         };
 
         if !text.is_empty() && text.len() < 30 {
-            println!("{}{} [{}] = \"{}\"", indent, kind, id, text);
+            println!("{indent}{kind} [{id}] = \"{text}\"");
         } else {
-            println!("{}{} [{}]", indent, kind, id);
+            println!("{indent}{kind} [{id}]");
         }
 
         for i in 0..node.child_count() {
