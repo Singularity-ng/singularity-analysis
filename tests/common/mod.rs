@@ -4,7 +4,7 @@ use std::{
 };
 
 use globset::{Glob, GlobSetBuilder};
-use singularity_code_analysis::{LANG, *};
+use singularity_analysis_engine::{LANG, *};
 
 const REPO: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/", "repositories");
 const SNAPSHOT_PATH: &str = concat!(
