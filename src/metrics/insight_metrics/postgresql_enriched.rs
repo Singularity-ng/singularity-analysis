@@ -1,7 +1,7 @@
-//! PostgreSQL + pgvector enriched insight metrics type definitions.
+//! `PostgreSQL` + pgvector enriched insight metrics type definitions.
 //!
 //! The structures in this module model the payloads exchanged with a
-//! PostgreSQL/pgvector backend.  They do not execute database calls on
+//! `PostgreSQL`/pgvector backend.  They do not execute database calls on
 //! their own—those live in the host integration layer (see
 //! `POSTGRESQL_INTEGRATION_GUIDE.md` for wiring details).  Keeping the
 //! types colocated with the rest of the insight metrics ensures that the
@@ -11,7 +11,7 @@
 use crate::langs::LANG;
 use std::collections::HashMap;
 
-/// PostgreSQL-enriched insight metrics that leverage vector search and relational data
+/// `PostgreSQL`-enriched insight metrics that leverage vector search and relational data
 #[derive(Debug, Clone, Default)]
 pub struct PostgreSQLEnrichedInsightMetrics {
     /// Semantic complexity with database patterns
@@ -26,7 +26,7 @@ pub struct PostgreSQLEnrichedInsightMetrics {
     pub testability_score: PostgreSQLTestabilityScore,
 }
 
-/// PostgreSQL-enriched semantic complexity
+/// `PostgreSQL`-enriched semantic complexity
 #[derive(Debug, Clone)]
 pub struct PostgreSQLSemanticComplexity {
     /// Overall semantic complexity score (0-100)
@@ -37,11 +37,11 @@ pub struct PostgreSQLSemanticComplexity {
     pub complexity_trends: Vec<ComplexityTrend>,
     /// Language-specific patterns from database
     pub language_patterns: HashMap<LANG, Vec<PostgreSQLPattern>>,
-    /// Code relationships from PostgreSQL
+    /// Code relationships from `PostgreSQL`
     pub code_relationships: Vec<CodeRelationship>,
 }
 
-/// PostgreSQL pattern with full metadata
+/// `PostgreSQL` pattern with full metadata
 #[derive(Debug, Clone)]
 pub struct PostgreSQLPattern {
     pub id: String,
@@ -86,7 +86,7 @@ pub struct ComplexityTrend {
     pub commit_hash: String,
 }
 
-/// Code relationship from PostgreSQL
+/// Code relationship from `PostgreSQL`
 #[derive(Debug, Clone)]
 pub struct CodeRelationship {
     pub source_id: String,
@@ -109,7 +109,7 @@ pub enum RelationshipType {
     TestedBy,
 }
 
-/// PostgreSQL-enriched refactoring readiness
+/// `PostgreSQL`-enriched refactoring readiness
 #[derive(Debug, Clone)]
 pub struct PostgreSQLRefactoringReadiness {
     pub readiness_score: f64,
@@ -121,7 +121,7 @@ pub struct PostgreSQLRefactoringReadiness {
     pub similar_refactorings: Vec<PostgreSQLRefactoringPattern>,
 }
 
-/// PostgreSQL refactoring opportunity
+/// `PostgreSQL` refactoring opportunity
 #[derive(Debug, Clone)]
 pub struct PostgreSQLRefactoringOpportunity {
     pub id: String,
@@ -141,7 +141,7 @@ pub struct PostgreSQLRefactoringOpportunity {
     pub example: String,
 }
 
-/// PostgreSQL refactoring pattern
+/// `PostgreSQL` refactoring pattern
 #[derive(Debug, Clone)]
 pub struct PostgreSQLRefactoringPattern {
     pub id: String,
@@ -155,7 +155,7 @@ pub struct PostgreSQLRefactoringPattern {
     pub tags: Vec<String>,
 }
 
-/// PostgreSQL-enriched composite code quality
+/// `PostgreSQL`-enriched composite code quality
 #[derive(Debug, Clone)]
 pub struct PostgreSQLCompositeCodeQuality {
     pub quality_score: f64,
@@ -167,7 +167,7 @@ pub struct PostgreSQLCompositeCodeQuality {
     pub quality_trends: Vec<QualityTrend>,
 }
 
-/// PostgreSQL quality factor
+/// `PostgreSQL` quality factor
 #[derive(Debug, Clone)]
 pub struct PostgreSQLQualityFactor {
     pub name: String,
@@ -181,7 +181,7 @@ pub struct PostgreSQLQualityFactor {
     pub industry_benchmark: f64,
 }
 
-/// PostgreSQL quality pattern
+/// `PostgreSQL` quality pattern
 #[derive(Debug, Clone)]
 pub struct PostgreSQLQualityPattern {
     pub id: String,
@@ -203,7 +203,7 @@ pub struct QualityTrend {
     pub file_path: String,
 }
 
-/// PostgreSQL-enriched code smell density
+/// `PostgreSQL`-enriched code smell density
 #[derive(Debug, Clone)]
 pub struct PostgreSQLCodeSmellDensity {
     pub smell_density: f64,
@@ -215,7 +215,7 @@ pub struct PostgreSQLCodeSmellDensity {
     pub resolution_patterns: Vec<SmellResolutionPattern>,
 }
 
-/// PostgreSQL code smell
+/// `PostgreSQL` code smell
 #[derive(Debug, Clone)]
 pub struct PostgreSQLCodeSmell {
     pub id: String,
@@ -254,7 +254,7 @@ pub struct SmellResolutionPattern {
     pub example: String,
 }
 
-/// PostgreSQL-enriched testability score
+/// `PostgreSQL`-enriched testability score
 #[derive(Debug, Clone)]
 pub struct PostgreSQLTestabilityScore {
     pub testability_score: f64,
@@ -266,7 +266,7 @@ pub struct PostgreSQLTestabilityScore {
     pub test_generation_patterns: Vec<TestGenerationPattern>,
 }
 
-/// PostgreSQL testability factor
+/// `PostgreSQL` testability factor
 #[derive(Debug, Clone)]
 pub struct PostgreSQLTestabilityFactor {
     pub name: String,
