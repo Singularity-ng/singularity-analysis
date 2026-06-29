@@ -13,10 +13,10 @@ use crate::{
 };
 
 #[inline]
-fn usize_to_f64(value: usize) -> f64 {
+fn usize_to_f64(n: usize) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f64
+        n as f64
     }
 }
 
@@ -76,7 +76,7 @@ impl fmt::Display for Stats {
 
 impl Stats {
     /// Merges a second `Npm` metric into the first one
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         self.class_npm_sum += other.class_npm_sum;
         self.interface_npm_sum += other.interface_npm_sum;
         self.class_nm_sum += other.class_nm_sum;
@@ -253,7 +253,12 @@ impl Npm for JavaCode {
                         // There are several modifiers that may be part of a method declaration
                         // Source: https://docs.oracle.com/javase/tutorial/reflect/member/methodModifiers.html
                         if let Some(modifiers) = method.child(0) {
+<<<<<<< Updated upstream
                             if matches!(modifiers.kind_id().into(), Modifiers)
+=======
+                            // Looks for the `public` keyword in the list of method modifiers
+                            if matches! {modifiers.kind_id().into(), Modifiers}
+>>>>>>> Stashed changes
                                 && modifiers.first_child(|id| id == Public).is_some()
                             {
                                 // Looks for the `public` keyword in the list of method modifiers
