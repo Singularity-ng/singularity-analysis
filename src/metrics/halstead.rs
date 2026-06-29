@@ -36,7 +36,7 @@ pub struct HalsteadMaps<'a> {
     pub(crate) operands: HashMap<&'a [u8], u64>,
 }
 
-impl<'a> HalsteadMaps<'a> {
+impl HalsteadMaps<'_> {
     pub(crate) fn new() -> Self {
         HalsteadMaps {
             operators: HashMap::default(),
@@ -44,7 +44,7 @@ impl<'a> HalsteadMaps<'a> {
         }
     }
 
-    pub(crate) fn merge(&mut self, other: &HalsteadMaps<'a>) {
+    pub(crate) fn merge(&mut self, other: &Self) {
         for (k, v) in &other.operators {
             *self.operators.entry(*k).or_insert(0) += v;
         }
@@ -123,15 +123,15 @@ impl fmt::Display for Stats {
 
 impl Stats {
     #[inline]
-    const fn u64_to_f64(value: u64) -> f64 {
+    const fn u64_to_f64(n: u64) -> f64 {
         #[allow(clippy::cast_precision_loss)]
         {
-            value as f64
+            n as f64
         }
     }
 
     #[allow(clippy::unused_self)]
-    pub(crate) fn merge(&self, _other: &Stats) {}
+    pub(crate) const fn merge(&self, _other: &Self) {}
 
     /// Returns `η1`, the number of distinct operators
     #[inline]
