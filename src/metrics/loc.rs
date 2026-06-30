@@ -15,10 +15,10 @@ use crate::{
 };
 
 #[inline]
-fn usize_to_f64(value: usize) -> f64 {
+fn usize_to_f64(n: usize) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f64
+        n as f64
     }
 }
 
@@ -79,7 +79,7 @@ impl Sloc {
     }
 
     #[inline]
-    pub fn merge(&mut self, other: &Sloc) {
+    pub fn merge(&mut self, other: &Self) {
         let other_sloc = other.current_lines();
         // Accumulate SLOC sum across scopes for accurate averaging
         self.sloc_sum += other_sloc;
@@ -147,7 +147,7 @@ impl Ploc {
     }
 
     #[inline]
-    pub fn merge(&mut self, other: &Ploc) {
+    pub fn merge(&mut self, other: &Self) {
         // Merge ploc lines
         for &line in &other.lines {
             self.lines.insert(line);
@@ -220,7 +220,7 @@ impl Cloc {
     }
 
     #[inline]
-    pub fn merge(&mut self, other: &Cloc) {
+    pub fn merge(&mut self, other: &Self) {
         // Merge cloc lines
         self.only_comment_lines += other.only_comment_lines;
         self.code_comment_lines += other.code_comment_lines;
@@ -288,7 +288,7 @@ impl Lloc {
     }
 
     #[inline]
-    pub fn merge(&mut self, other: &Lloc) {
+    pub fn merge(&mut self, other: &Self) {
         // Merge lloc lines
         self.logical_lines += other.logical_lines;
         let other_lloc = other.line_count();
@@ -406,7 +406,7 @@ impl Stats {
     }
 
     /// Merges a second `Loc` metric suite into the first one
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         self.sloc.merge(&other.sloc);
         self.ploc.merge(&other.ploc);
         self.cloc.merge(&other.cloc);
@@ -678,12 +678,22 @@ impl Loc for PythonCode {
                 add_cloc_lines(stats, start, end);
             }
             String => {
+<<<<<<< Updated upstream
                 let parent = node.parent().expect("TODO: Add context for why this shouldn't fail");
                 if let ExpressionStatement = parent.kind_id().into() {
                     add_cloc_lines(stats, start, end);
                 } else if parent.start_row() != start {
                     check_comment_ends_on_code_line(stats, start);
                     stats.ploc.lines.insert(start);
+=======
+                if let Some(parent) = node.parent() {
+                    if let ExpressionStatement = parent.kind_id().into() {
+                        add_cloc_lines(stats, start, end);
+                    } else if parent.start_row() != start {
+                        check_comment_ends_on_code_line(stats, start);
+                        stats.ploc.lines.insert(start);
+                    }
+>>>>>>> Stashed changes
                 }
             }
             Statement
@@ -972,10 +982,10 @@ impl Loc for CppCode {
             Declaration => {
                 if node.count_specific_ancestors::<CppParser>(
                     |node| {
-                        matches!(
+                        matches! {
                             node.kind_id().into(),
                             WhileStatement | ForStatement | IfStatement
-                        )
+                        }
                     },
                     |node| node.kind_id() == CompoundStatement,
                 ) == 0
