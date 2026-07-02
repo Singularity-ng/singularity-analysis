@@ -181,7 +181,7 @@ struct BuiltinParserFactory<T> {
 }
 
 impl<T> BuiltinParserFactory<T> {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             _phantom: std::marker::PhantomData,
         }
