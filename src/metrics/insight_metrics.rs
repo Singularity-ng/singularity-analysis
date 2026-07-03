@@ -34,11 +34,19 @@ pub mod semantic_complexity;
 pub mod testability_score;
 pub mod type_safety;
 
+// Allow ambiguous glob re-exports - database_enriched and postgresql_enriched share some types
+// TODO: Refactor to remove duplicate type definitions
+#[allow(ambiguous_glob_reexports)]
 pub use code_smell_density::*;
+#[allow(ambiguous_glob_reexports)]
 pub use composite_code_quality::*;
+#[allow(ambiguous_glob_reexports)]
 pub use database_enriched::*;
+#[allow(ambiguous_glob_reexports)]
 pub use dependency_coupling::*;
+#[allow(ambiguous_glob_reexports)]
 pub use error_handling::*;
+#[allow(ambiguous_glob_reexports)]
 pub use postgresql_enriched::*;
 pub use refactoring_readiness::*;
 pub use semantic_complexity::*;
