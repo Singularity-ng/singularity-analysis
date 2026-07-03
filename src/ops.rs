@@ -61,7 +61,7 @@ impl Ops {
         }
     }
 
-    pub(crate) fn merge_ops(&mut self, other: &Ops) {
+    pub(crate) fn merge_ops(&mut self, other: &Self) {
         self.operands.extend_from_slice(&other.operands);
         self.operators.extend_from_slice(&other.operators);
     }
@@ -104,17 +104,33 @@ fn finalize<T: ParserTrait>(state_stack: &mut Vec<State>, diff_level: usize) {
 
     // If there is only the unit space
     if state_stack.len() == 1 {
+<<<<<<< Updated upstream
         let last_state = state_stack.last_mut().expect("TODO: Add context for why this shouldn't fail");
         // Compute last_state operators and operands
         compute_operators_and_operands::<T>(last_state);
+=======
+        if let Some(last_state) = state_stack.last_mut() {
+            // Compute last_state operators and operands
+            compute_operators_and_operands::<T>(last_state);
+        }
+>>>>>>> Stashed changes
     }
 
     for _ in 0..diff_level {
         if state_stack.len() == 1 {
             break;
         }
+<<<<<<< Updated upstream
         let mut state = state_stack.pop().expect("TODO: Add context for why this shouldn't fail");
         let last_state = state_stack.last_mut().expect("TODO: Add context for why this shouldn't fail");
+=======
+        let Some(mut state) = state_stack.pop() else {
+            continue;
+        };
+        let Some(last_state) = state_stack.last_mut() else {
+            continue;
+        };
+>>>>>>> Stashed changes
 
         // Compute state operators and operands
         compute_operators_and_operands::<T>(&mut state);
