@@ -117,7 +117,7 @@ impl fmt::Display for Stats {
 
 impl Stats {
     /// Merges a second `Abc` metric into the first one.
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         // Calculates minimum and maximum values
         self.assignments_min = self.assignments_min.min(other.assignments_min);
         self.assignments_max = self.assignments_max.max(other.assignments_max);
@@ -142,13 +142,13 @@ impl Stats {
 
     /// Returns the `Abc` assignments metric value.
     #[must_use]
-    pub fn assignments(&self) -> f64 {
+    pub const fn assignments(&self) -> f64 {
         self.assignments
     }
 
     /// Returns the `Abc` assignments sum metric value.
     #[must_use]
-    pub fn assignments_sum(&self) -> f64 {
+    pub const fn assignments_sum(&self) -> f64 {
         self.assignments_sum
     }
 
@@ -163,25 +163,25 @@ impl Stats {
 
     /// Returns the `Abc` assignments minimum value.
     #[must_use]
-    pub fn assignments_min(&self) -> f64 {
+    pub const fn assignments_min(&self) -> f64 {
         self.assignments_min
     }
 
     /// Returns the `Abc` assignments maximum value.
     #[must_use]
-    pub fn assignments_max(&self) -> f64 {
+    pub const fn assignments_max(&self) -> f64 {
         self.assignments_max
     }
 
     /// Returns the `Abc` branches metric value.
     #[must_use]
-    pub fn branches(&self) -> f64 {
+    pub const fn branches(&self) -> f64 {
         self.branches
     }
 
     /// Returns the `Abc` branches sum metric value.
     #[must_use]
-    pub fn branches_sum(&self) -> f64 {
+    pub const fn branches_sum(&self) -> f64 {
         self.branches_sum
     }
 
@@ -196,25 +196,25 @@ impl Stats {
 
     /// Returns the `Abc` branches minimum value.
     #[must_use]
-    pub fn branches_min(&self) -> f64 {
+    pub const fn branches_min(&self) -> f64 {
         self.branches_min
     }
 
     /// Returns the `Abc` branches maximum value.
     #[must_use]
-    pub fn branches_max(&self) -> f64 {
+    pub const fn branches_max(&self) -> f64 {
         self.branches_max
     }
 
     /// Returns the `Abc` conditions metric value.
     #[must_use]
-    pub fn conditions(&self) -> f64 {
+    pub const fn conditions(&self) -> f64 {
         self.conditions
     }
 
     /// Returns the `Abc` conditions sum metric value.
     #[must_use]
-    pub fn conditions_sum(&self) -> f64 {
+    pub const fn conditions_sum(&self) -> f64 {
         self.conditions_sum
     }
 
@@ -229,27 +229,28 @@ impl Stats {
 
     /// Returns the `Abc` conditions minimum value.
     #[must_use]
-    pub fn conditions_min(&self) -> f64 {
+    pub const fn conditions_min(&self) -> f64 {
         self.conditions_min
     }
 
     /// Returns the `Abc` conditions maximum value.
     #[must_use]
-    pub fn conditions_max(&self) -> f64 {
+    pub const fn conditions_max(&self) -> f64 {
         self.conditions_max
     }
 
     /// Returns the `Abc` magnitude metric value.
     #[must_use]
     pub fn magnitude(&self) -> f64 {
-        (self.assignments.powi(2) + self.branches.powi(2) + self.conditions.powi(2)).sqrt()
+        self.assignments.hypot(self.branches).hypot(self.conditions)
     }
 
     /// Returns the `Abc` magnitude sum metric value.
     #[must_use]
     pub fn magnitude_sum(&self) -> f64 {
-        (self.assignments_sum.powi(2) + self.branches_sum.powi(2) + self.conditions_sum.powi(2))
-            .sqrt()
+        self.assignments_sum
+            .hypot(self.branches_sum)
+            .hypot(self.conditions_sum)
     }
 
     #[inline]
@@ -288,6 +289,7 @@ fn java_inspect_container(container_node: &Node, conditions: &mut f64) {
     let mut node_kind = node.kind_id().into();
 
     // Initializes the flag to true if the container is known to contain a boolean value
+<<<<<<< Updated upstream
     let mut has_boolean_content = match node.parent().expect("TODO: Add context for why this shouldn't fail").kind_id().into() {
         BinaryExpression | IfStatement | WhileStatement | DoStatement | ForStatement => true,
         TernaryExpression => node
@@ -295,14 +297,29 @@ fn java_inspect_container(container_node: &Node, conditions: &mut f64) {
             .is_none_or(|prev_node| !matches!(prev_node.kind_id().into(), QMARK | COLON)),
         _ => false,
     };
+=======
+    let mut has_boolean_content =
+        node.parent()
+            .is_some_and(|parent| match parent.kind_id().into() {
+                BinaryExpression | IfStatement | WhileStatement | DoStatement | ForStatement => {
+                    true
+                }
+                TernaryExpression => node
+                    .previous_sibling()
+                    .is_none_or(|prev_node| !matches! {prev_node.kind_id().into(), QMARK | COLON}),
+                _ => false,
+            });
+>>>>>>> Stashed changes
 
     // Looks inside parenthesized expressions and `Not` operators to find what they contain
     loop {
         // Checks if the node is a parenthesized expression or a `Not` operator
         // The child node of index 0 contains the unary expression operator (we look for the `!` operator)
-        let is_parenthesised_exp = matches!(node_kind, ParenthesizedExpression);
-        let is_not_operator = matches!(node_kind, UnaryExpression)
-            && matches!(node.child(0).unwrap().kind_id().into(), BANG);
+        let is_parenthesised_exp = matches! {node_kind, ParenthesizedExpression};
+        let is_not_operator = matches! {node_kind, UnaryExpression}
+            && node
+                .child(0)
+                .is_some_and(|child| matches! {child.kind_id().into(), BANG});
 
         // Stops the exploration if the node is neither
         // a parenthesized expression nor a `Not` operator
@@ -321,11 +338,18 @@ fn java_inspect_container(container_node: &Node, conditions: &mut f64) {
         // always store their expressions in the children nodes of index one
         // https://github.com/tree-sitter/tree-sitter-java/blob/master/src/grammar.json#L2472
         // https://github.com/tree-sitter/tree-sitter-java/blob/master/src/grammar.json#L2150
+<<<<<<< Updated upstream
         node = node.child(1).expect("TODO: Add context for why this shouldn't fail");
+=======
+        let Some(child_node) = node.child(1) else {
+            return;
+        };
+        node = child_node;
+>>>>>>> Stashed changes
         node_kind = node.kind_id().into();
 
         // Stops the exploration when the content is found
-        if matches!(node_kind, MethodInvocation | Identifier | True | False) {
+        if matches! {node_kind, MethodInvocation | Identifier | True | False} {
             if has_boolean_content {
                 *conditions += 1.;
             }
@@ -350,9 +374,9 @@ fn java_count_unary_conditions(list_node: &Node, conditions: &mut f64) {
             let node_kind = node.kind_id().into();
 
             // Checks if the node is a unary condition
-            if matches!(node_kind, MethodInvocation | Identifier | True | False)
-                && matches!(list_kind, BinaryExpression)
-                && !matches!(list_kind, ArgumentList)
+            if matches! {node_kind, MethodInvocation | Identifier | True | False}
+                && matches! {list_kind, BinaryExpression}
+                && !matches! {list_kind, ArgumentList}
             {
                 *conditions += 1.;
             } else {
@@ -408,7 +432,7 @@ impl Abc for JavaCode {
                 stats.declaration.push(DeclKind::Var);
             }
             Final => {
-                if let Some(DeclKind::Var) = stats.declaration.last() {
+                if matches! {stats.declaration.last(), Some(DeclKind::Var)} {
                     stats.declaration.push(DeclKind::Const);
                 }
             }
@@ -432,8 +456,15 @@ impl Abc for JavaCode {
             }
             GT | LT => {
                 // Excludes `<` and `>` used for generic types
+<<<<<<< Updated upstream
                 if let Some(parent) = node.parent() && !matches!(parent.kind_id().into(), TypeArguments) {
                     stats.conditions += 1.;
+=======
+                if let Some(parent) = node.parent() {
+                    if !matches! {parent.kind_id().into(), TypeArguments} {
+                        stats.conditions += 1.;
+                    }
+>>>>>>> Stashed changes
                 }
             }
             // Counts unary conditions in elements separated by `&&` or `||` boolean operators
@@ -450,10 +481,10 @@ impl Abc for JavaCode {
             VariableDeclarator | AssignmentExpression => {
                 // The child node of index 2 contains the right operand of an assignment operation
                 if let Some(right_operand) = node.child(2) {
-                    if matches!(
+                    if matches! {
                         right_operand.kind_id().into(),
                         ParenthesizedExpression | UnaryExpression
-                    ) {
+                    } {
                         java_inspect_container(&right_operand, &mut stats.conditions);
                     }
                 }
@@ -462,7 +493,7 @@ impl Abc for JavaCode {
             IfStatement | WhileStatement => {
                 // The child node of index 1 contains the condition
                 if let Some(condition) = node.child(1) {
-                    if matches!(condition.kind_id().into(), ParenthesizedExpression) {
+                    if matches! {condition.kind_id().into(), ParenthesizedExpression} {
                         java_inspect_container(&condition, &mut stats.conditions);
                     }
                 }
@@ -471,7 +502,7 @@ impl Abc for JavaCode {
             DoStatement => {
                 // The child node of index 3 contains the condition
                 if let Some(condition) = node.child(3) {
-                    if matches!(condition.kind_id().into(), ParenthesizedExpression) {
+                    if matches! {condition.kind_id().into(), ParenthesizedExpression} {
                         java_inspect_container(&condition, &mut stats.conditions);
                     }
                 }
@@ -513,24 +544,24 @@ impl Abc for JavaCode {
             // Counts unary conditions inside return statements
             ReturnStatement => {
                 // The child node of index 1 contains the return value
-                if let Some(value) = node.child(1) {
-                    if matches!(
-                        value.kind_id().into(),
+                if let Some(item) = node.child(1) {
+                    if matches! {
+                        item.kind_id().into(),
                         ParenthesizedExpression | UnaryExpression
-                    ) {
-                        java_inspect_container(&value, &mut stats.conditions);
+                    } {
+                        java_inspect_container(&item, &mut stats.conditions);
                     }
                 }
             }
             // Counts unary conditions inside implicit return statements in lambda expressions
             LambdaExpression => {
                 // The child node of index 2 contains the return value
-                if let Some(value) = node.child(2) {
-                    if matches!(
-                        value.kind_id().into(),
+                if let Some(item) = node.child(2) {
+                    if matches! {
+                        item.kind_id().into(),
                         ParenthesizedExpression | UnaryExpression
-                    ) {
-                        java_inspect_container(&value, &mut stats.conditions);
+                    } {
+                        java_inspect_container(&item, &mut stats.conditions);
                     }
                 }
             }
@@ -550,19 +581,19 @@ impl Abc for JavaCode {
                 }
                 // The child node of index 2 contains the first expression
                 if let Some(expression) = node.child(2) {
-                    if matches!(
+                    if matches! {
                         expression.kind_id().into(),
                         ParenthesizedExpression | UnaryExpression
-                    ) {
+                    } {
                         java_inspect_container(&expression, &mut stats.conditions);
                     }
                 }
                 // The child node of index 4 contains the second expression
                 if let Some(expression) = node.child(4) {
-                    if matches!(
+                    if matches! {
                         expression.kind_id().into(),
                         ParenthesizedExpression | UnaryExpression
-                    ) {
+                    } {
                         java_inspect_container(&expression, &mut stats.conditions);
                     }
                 }
