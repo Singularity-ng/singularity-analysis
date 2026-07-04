@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used)]
+
 use std::{
     collections::{hash_map, HashMap, HashSet},
     path::{Path, PathBuf},
