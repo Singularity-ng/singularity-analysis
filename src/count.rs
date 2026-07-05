@@ -10,10 +10,10 @@ use num_format::{Locale, ToFormattedString};
 use crate::traits::{Callback, ParserTrait};
 
 #[inline]
-fn usize_to_f64(value: usize) -> f64 {
+fn usize_to_f64(n: usize) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f64
+        n as f64
     }
 }
 
@@ -72,7 +72,13 @@ impl Callback for Count {
 
     fn call<T: ParserTrait>(cfg: Self::Cfg, parser: &T) -> Self::Res {
         let (good, total) = count(parser, &cfg.filters);
+<<<<<<< Updated upstream
         let mut results = cfg.stats.lock().expect("TODO: Add context for why this shouldn't fail");
+=======
+        let mut results = cfg.stats.lock().map_err(|e| {
+            std::io::Error::other(format!("Failed to acquire lock on stats mutex: {e}"))
+        })?;
+>>>>>>> Stashed changes
         results.good += good;
         results.total += total;
         Ok(())
