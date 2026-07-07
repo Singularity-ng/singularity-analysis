@@ -52,6 +52,7 @@ where
             // outlives the analysis context. The guard returned by
             // `enter_code_context` clears the stored pointer before the
             // underlying slice is dropped, so this conversion is safe.
+            #[allow(unsafe_code)]
             let slice = unsafe { slice::from_raw_parts(code_ref.ptr, code_ref.len) };
             f(slice)
         })
