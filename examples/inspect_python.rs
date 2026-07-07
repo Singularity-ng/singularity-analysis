@@ -1,10 +1,17 @@
 /// Inspects Python tree-sitter node types to help understand the AST structure
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 use tree_sitter::Parser;
 
 fn main() {
     let language = tree_sitter_python::LANGUAGE.into();
     let mut parser = Parser::new();
+<<<<<<< Updated upstream
     parser.set_language(&language).expect("TODO: Add context for why this shouldn't fail");
+=======
+    parser
+        .set_language(&language)
+        .expect("Failed to set language");
+>>>>>>> Stashed changes
 
     let source_code = r"
 def f(a, b):
@@ -14,7 +21,13 @@ def f(a, b):
         return 1
 ";
 
+<<<<<<< Updated upstream
     let tree = parser.parse(source_code, None).expect("TODO: Add context for why this shouldn't fail");
+=======
+    let tree = parser
+        .parse(source_code, None)
+        .expect("Failed to parse source code");
+>>>>>>> Stashed changes
     let root = tree.root_node();
 
     println!("=== Python Tree-Sitter Node Types ===\n");
