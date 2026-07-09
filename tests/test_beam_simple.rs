@@ -1,4 +1,4 @@
-use singularity_code_analysis::{get_function_spaces, LANG};
+use singularity_analysis_engine::{get_function_spaces, LANG};
 use std::path::Path;
 
 #[test]
