@@ -66,8 +66,14 @@ impl Callback for Find {
     type Cfg = FindCfg;
 
     fn call<T: ParserTrait>(cfg: Self::Cfg, parser: &T) -> Self::Res {
+<<<<<<< Updated upstream
         if let Some(good) = find(parser, &cfg.filters) && !good.is_empty() {
             println!("In file {}", cfg.path.to_str().unwrap());
+=======
+        if let Some(good) = find(parser, &cfg.filters) {
+            if !good.is_empty() {
+                println!("In file {}", cfg.path.to_str().unwrap_or("<non-UTF8 path>"));
+>>>>>>> Stashed changes
                 for node in good {
                     dump_node(parser.get_code(), &node, 1, cfg.line_start, cfg.line_end)?;
                 }
