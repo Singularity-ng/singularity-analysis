@@ -65,10 +65,10 @@ impl fmt::Display for Stats {
 
 impl Stats {
     #[inline]
-    const fn usize_to_f64(value: usize) -> f64 {
+    const fn usize_to_f64(n: usize) -> f64 {
         #[allow(clippy::cast_precision_loss)]
         {
-            value as f64
+            n as f64
         }
     }
 
@@ -81,22 +81,22 @@ impl Stats {
 
     /// Returns the `NExit` metric value
     #[must_use]
-    pub fn exit(&self) -> f64 {
+    pub const fn exit(&self) -> f64 {
         Self::usize_to_f64(self.exit)
     }
     /// Returns the `NExit` metric sum value
     #[must_use]
-    pub fn exit_sum(&self) -> f64 {
+    pub const fn exit_sum(&self) -> f64 {
         Self::usize_to_f64(self.exit_sum)
     }
     /// Returns the `NExit` metric  minimum value
     #[must_use]
-    pub fn exit_min(&self) -> f64 {
+    pub const fn exit_min(&self) -> f64 {
         Self::usize_to_f64(self.exit_min)
     }
     /// Returns the `NExit` metric maximum value
     #[must_use]
-    pub fn exit_max(&self) -> f64 {
+    pub const fn exit_max(&self) -> f64 {
         Self::usize_to_f64(self.exit_max)
     }
 
@@ -149,7 +149,7 @@ fn call_matches_any(node: &Node, names: &[&str]) -> bool {
             "dot" | "remote" => {
                 for idx in (0..target.child_count()).rev() {
                     if let Some(child) = target.child(idx) {
-                        if matches!(child.kind(), "identifier" | "atom" | "operator_identifier") {
+                        if matches! {child.kind(), "identifier" | "atom" | "operator_identifier"} {
                             return analysis_context::node_text_equals_any(&child, names);
                         }
                     }
@@ -205,7 +205,7 @@ impl Exit for TsxCode {
 
 impl Exit for RustCode {
     fn compute(node: &Node, stats: &mut Stats) {
-        if matches!(node.kind(), "return_expression" | "try_expression")
+        if matches! {node.kind(), "return_expression" | "try_expression"}
             || Self::is_func(node) && node.child_by_field_name("return_type").is_some()
         {
             stats.exit += 1;
@@ -247,7 +247,7 @@ impl Exit for ErlangCode {
 
 impl Exit for GleamCode {
     fn compute(node: &Node, stats: &mut Stats) {
-        if matches!(node.kind(), "panic" | "todo") {
+        if matches! {node.kind(), "panic" | "todo"} {
             stats.exit += 1;
         }
     }
@@ -255,7 +255,7 @@ impl Exit for GleamCode {
 
 impl Exit for LuaCode {
     fn compute(node: &Node, stats: &mut Stats) {
-        if matches!(node.kind(), "return_statement" | "break_statement") {
+        if matches! {node.kind(), "return_statement" | "break_statement"} {
             stats.exit += 1;
         }
     }
@@ -271,10 +271,10 @@ impl Exit for GoCode {
 
 impl Exit for KotlinCode {
     fn compute(node: &Node, stats: &mut Stats) {
-        if matches!(
+        if matches! {
             node.kind(),
             "return_expression" | "throw_expression" | "jump_expression"
-        ) {
+        } {
             stats.exit += 1;
         }
     }
@@ -282,7 +282,7 @@ impl Exit for KotlinCode {
 
 impl Exit for CsharpCode {
     fn compute(node: &Node, stats: &mut Stats) {
-        if matches!(
+        if matches! {
             node.kind(),
             "return_statement"
                 | "throw_statement"
@@ -290,7 +290,7 @@ impl Exit for CsharpCode {
                 | "break_statement"
                 | "continue_statement"
                 | "goto_statement"
-        ) {
+        } {
             stats.exit += 1;
         }
     }
