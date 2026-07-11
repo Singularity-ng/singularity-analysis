@@ -764,7 +764,7 @@ impl Getter for CppCode {
             Identifier | TypeIdentifier | FieldIdentifier | RawStringLiteral | StringLiteral
             | NumberLiteral | True | False | Null | DOTDOTDOT => HalsteadType::Operand,
             NamespaceIdentifier => match node.parent() {
-                Some(parent) if matches!(parent.kind_id().into(), NamespaceDefinition) => {
+                Some(parent) if matches! {parent.kind_id().into(), NamespaceDefinition} => {
                     HalsteadType::Operand
                 }
                 _ => HalsteadType::Unknown,
@@ -923,12 +923,12 @@ impl Getter for ElixirCode {
                             if head.kind() == "identifier" {
                                 // Determine whether this do-block belongs to a module or a function
                                 return with_keyword(&head, |kw| {
-                                    if matches!(kw, "defmodule" | "defprotocol" | "defimpl") {
+                                    if matches! {kw, "defmodule" | "defprotocol" | "defimpl"} {
                                         SpaceKind::Unit
-                                    } else if matches!(
+                                    } else if matches! {
                                         kw,
                                         "def" | "defp" | "defmacro" | "defmacrop"
-                                    ) {
+                                    } {
                                         SpaceKind::Function
                                     } else {
                                         SpaceKind::Unknown
@@ -1019,10 +1019,10 @@ fn extract_first_named_text<'a>(node: &Node, code: &'a [u8]) -> Option<&'a str> 
             if !child.is_named() {
                 continue;
             }
-            if matches!(
+            if matches! {
                 child.kind(),
                 "alias" | "atom" | "identifier" | "quoted_atom"
-            ) {
+            } {
                 return node_text(&child, code);
             }
         }
@@ -1043,7 +1043,7 @@ fn extract_function_head_name<'a>(arguments: &Node, code: &'a [u8]) -> Option<&'
                             if !name_node.is_named() {
                                 continue;
                             }
-                            if matches!(name_node.kind(), "identifier" | "atom" | "quoted_atom") {
+                            if matches! {name_node.kind(), "identifier" | "atom" | "quoted_atom"} {
                                 return node_text(&name_node, code);
                             }
                             break;
