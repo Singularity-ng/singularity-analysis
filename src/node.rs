@@ -9,12 +9,25 @@ use crate::{
 pub(crate) struct Tree(OtherTree);
 
 impl Tree {
+    #[allow(clippy::expect_used, clippy::panic)]
     pub(crate) fn new<T: LanguageInfo>(code: &[u8]) -> Self {
         let mut parser = Parser::new();
+        // SAFETY: set_language should always succeed with a valid language
         parser
+<<<<<<< Updated upstream
             .set_language(&T::get_lang().get_ts_language()).expect("TODO: Add context for why this shouldn't fail");
 
         Self(parser.parse(code, None).expect("TODO: Add context for why this shouldn't fail"))
+=======
+            .set_language(&T::get_lang().get_ts_language())
+            .expect("tree-sitter language registration failed");
+
+        // SAFETY: parse should always succeed or return None
+        let tree = parser
+            .parse(code, None)
+            .unwrap_or_else(|| panic!("tree-sitter parser returned no tree"));
+        Self(tree)
+>>>>>>> Stashed changes
     }
 
     pub(crate) fn get_root(&self) -> Node<'_> {
@@ -46,8 +59,8 @@ impl<'a> Node<'a> {
         self.0.kind_id()
     }
 
-    pub(crate) fn utf8_text(&self, data: &'a [u8]) -> Option<&'a str> {
-        self.0.utf8_text(data).ok()
+    pub(crate) fn utf8_text(&self, code: &'a [u8]) -> Option<&'a str> {
+        self.0.utf8_text(code).ok()
     }
 
     pub(crate) fn start_byte(&self) -> usize {
@@ -59,13 +72,13 @@ impl<'a> Node<'a> {
     }
 
     pub(crate) fn start_position(&self) -> (usize, usize) {
-        let temp = self.0.start_position();
-        (temp.row, temp.column)
+        let pos = self.0.start_position();
+        (pos.row, pos.column)
     }
 
     pub(crate) fn end_position(&self) -> (usize, usize) {
-        let temp = self.0.end_position();
-        (temp.row, temp.column)
+        let pos = self.0.end_position();
+        (pos.row, pos.column)
     }
 
     pub(crate) fn start_row(&self) -> usize {
@@ -76,7 +89,7 @@ impl<'a> Node<'a> {
         self.0.end_position().row
     }
 
-    pub(crate) fn parent(&self) -> Option<Node<'a>> {
+    pub(crate) fn parent(&self) -> Option<Self> {
         self.0.parent().map(Node)
     }
 
@@ -90,15 +103,15 @@ impl<'a> Node<'a> {
         })
     }
 
-    pub(crate) fn previous_sibling(&self) -> Option<Node<'a>> {
+    pub(crate) fn previous_sibling(&self) -> Option<Self> {
         self.0.prev_sibling().map(Node)
     }
 
-    pub(crate) fn next_sibling(&self) -> Option<Node<'a>> {
+    pub(crate) fn next_sibling(&self) -> Option<Self> {
         self.0.next_sibling().map(Node)
     }
 
-    pub(crate) fn previous_named_sibling(&self) -> Option<Node<'a>> {
+    pub(crate) fn previous_named_sibling(&self) -> Option<Self> {
         let mut sibling = self.previous_sibling();
         while let Some(node) = sibling {
             if node.is_named() {
@@ -128,7 +141,7 @@ impl<'a> Node<'a> {
         self.0.child_by_field_name(name).map(Node)
     }
 
-    pub(crate) fn child(&self, pos: usize) -> Option<Node<'a>> {
+    pub(crate) fn child(&self, pos: usize) -> Option<Self> {
         self.0.child(pos).map(Node)
     }
 
@@ -207,7 +220,7 @@ impl<'a> Cursor<'a> {
 }
 
 impl<'a> Search<'a> for Node<'a> {
-    fn first_occurrence(&self, pred: fn(u16) -> bool) -> Option<Node<'a>> {
+    fn first_occurrence(&self, pred: fn(u16) -> bool) -> Option<Self> {
         let mut cursor = self.cursor();
         let mut stack = Vec::new();
         let mut children = Vec::new();
@@ -235,7 +248,7 @@ impl<'a> Search<'a> for Node<'a> {
         None
     }
 
-    fn act_on_node(&self, action: &mut dyn FnMut(&Node<'a>)) {
+    fn act_on_node(&self, action: &mut dyn FnMut(&Self)) {
         let mut cursor = self.cursor();
         let mut stack = Vec::new();
         let mut children = Vec::new();
@@ -259,7 +272,7 @@ impl<'a> Search<'a> for Node<'a> {
         }
     }
 
-    fn first_occurrence_kind(&self, pred: fn(&Node<'a>) -> bool) -> Option<Node<'a>> {
+    fn first_occurrence_kind(&self, pred: fn(&Self) -> bool) -> Option<Self> {
         let mut cursor = self.cursor();
         let mut stack = Vec::new();
         let mut children = Vec::new();
@@ -287,15 +300,15 @@ impl<'a> Search<'a> for Node<'a> {
         None
     }
 
-    fn first_child(&self, pred: fn(u16) -> bool) -> Option<Node<'a>> {
+    fn first_child(&self, pred: fn(u16) -> bool) -> Option<Self> {
         self.children().find(|&child| pred(child.kind_id()))
     }
 
-    fn first_child_kind(&self, pred: fn(&Node<'a>) -> bool) -> Option<Node<'a>> {
+    fn first_child_kind(&self, pred: fn(&Self) -> bool) -> Option<Self> {
         self.children().find(pred)
     }
 
-    fn act_on_child(&self, action: &mut dyn FnMut(&Node<'a>)) {
+    fn act_on_child(&self, action: &mut dyn FnMut(&Self)) {
         for child in self.children() {
             action(&child);
         }
