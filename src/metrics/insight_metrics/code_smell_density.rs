@@ -33,7 +33,7 @@ impl CodeSmellDensityStats {
         let mut smells = Vec::new();
 
         // Detect various code smells
-        if self.has_long_functions(code) {
+        if Self::has_long_functions(code) {
             smells.push(SmellType {
                 name: "Long Functions".to_string(),
                 count: 1,
@@ -41,7 +41,7 @@ impl CodeSmellDensityStats {
             });
         }
 
-        if self.has_duplicate_code(code) {
+        if Self::has_duplicate_code(code) {
             smells.push(SmellType {
                 name: "Duplicate Code".to_string(),
                 count: 1,
@@ -49,7 +49,7 @@ impl CodeSmellDensityStats {
             });
         }
 
-        if self.has_deep_nesting(code) {
+        if Self::has_deep_nesting(code) {
             smells.push(SmellType {
                 name: "Deep Nesting".to_string(),
                 count: 1,
@@ -57,7 +57,7 @@ impl CodeSmellDensityStats {
             });
         }
 
-        if self.has_magic_numbers(code) {
+        if Self::has_magic_numbers(code) {
             smells.push(SmellType {
                 name: "Magic Numbers".to_string(),
                 count: 1,
@@ -65,7 +65,7 @@ impl CodeSmellDensityStats {
             });
         }
 
-        if self.has_dead_code(code) {
+        if Self::has_dead_code(code) {
             smells.push(SmellType {
                 name: "Dead Code".to_string(),
                 count: 1,
@@ -86,11 +86,11 @@ impl CodeSmellDensityStats {
         self.smell_density
     }
 
-    fn has_long_functions(&self, code: &str) -> bool {
+    fn has_long_functions(code: &str) -> bool {
         code.lines().count() > 50
     }
 
-    fn has_duplicate_code(&self, code: &str) -> bool {
+    fn has_duplicate_code(code: &str) -> bool {
         let lines: Vec<&str> = code.lines().collect();
         for i in 0..lines.len() {
             for j in (i + 1)..lines.len() {
@@ -102,7 +102,7 @@ impl CodeSmellDensityStats {
         false
     }
 
-    fn has_deep_nesting(&self, code: &str) -> bool {
+    fn has_deep_nesting(code: &str) -> bool {
         let mut max_nesting = 0;
         let mut current_nesting = 0;
 
@@ -124,12 +124,12 @@ impl CodeSmellDensityStats {
         max_nesting > 4
     }
 
-    fn has_magic_numbers(&self, code: &str) -> bool {
+    fn has_magic_numbers(code: &str) -> bool {
         // Simple heuristic: check for hardcoded numbers
         code.matches(" 0 ").count() > 3 || code.matches(" 1 ").count() > 3
     }
 
-    fn has_dead_code(&self, code: &str) -> bool {
+    fn has_dead_code(code: &str) -> bool {
         // Simple heuristic: check for unreachable code patterns
         code.contains("return") && code.contains("unreachable")
     }
