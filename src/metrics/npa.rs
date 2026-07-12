@@ -13,10 +13,10 @@ use crate::{
 };
 
 #[inline]
-fn usize_to_f64(value: usize) -> f64 {
+fn usize_to_f64(n: usize) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
-        value as f64
+        n as f64
     }
 }
 
@@ -76,7 +76,7 @@ impl fmt::Display for Stats {
 
 impl Stats {
     /// Merges a second `Npa` metric into the first one
-    pub fn merge(&mut self, other: &Stats) {
+    pub fn merge(&mut self, other: &Self) {
         self.class_npa_sum += other.class_npa_sum;
         self.interface_npa_sum += other.interface_npa_sum;
         self.class_na_sum += other.class_na_sum;
@@ -250,19 +250,19 @@ impl Npa for JavaCode {
             ClassBody => {
                 stats.class_na += node
                     .children()
-                    .filter(|node| matches!(node.kind_id().into(), FieldDeclaration))
+                    .filter(|node| matches! {node.kind_id().into(), FieldDeclaration})
                     .map(|declaration| {
                         let attributes = declaration
                             .children()
-                            .filter(|n| matches!(n.kind_id().into(), VariableDeclarator))
+                            .filter(|n| matches! {n.kind_id().into(), VariableDeclarator})
                             .count();
                         // The first child node contains the list of attribute modifiers
                         // There are several modifiers that may be part of a field declaration
                         // Source: https://docs.oracle.com/javase/tutorial/reflect/member/fieldModifiers.html
                         if declaration.child(0).is_some_and(|modifiers| {
                             // Looks for the `public` keyword in the list of attribute modifiers
-                            matches!(modifiers.kind_id().into(), Modifiers)
-                                && modifiers.first_child(|id| id == Public).is_some()
+                            (matches! {modifiers.kind_id().into(), Modifiers}
+                                && modifiers.first_child(|id| id == Public).is_some())
                         }) {
                             stats.class_npa += attributes;
                         }
@@ -278,9 +278,9 @@ impl Npa for JavaCode {
                 // Source: https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html
                 stats.interface_na += node
                     .children()
-                    .filter(|node| matches!(node.kind_id().into(), ConstantDeclaration))
+                    .filter(|node| matches! {node.kind_id().into(), ConstantDeclaration})
                     .flat_map(|node| node.children())
-                    .filter(|node| matches!(node.kind_id().into(), VariableDeclarator))
+                    .filter(|node| matches! {node.kind_id().into(), VariableDeclarator})
                     .count();
                 stats.interface_npa = stats.interface_na;
             }
