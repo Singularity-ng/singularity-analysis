@@ -25,7 +25,7 @@ impl Default for SemanticComplexityStats {
 
 impl SemanticComplexityStats {
     pub fn calculate_semantic_complexity(&mut self, code: &str, language: LANG) -> f64 {
-        let patterns = self.analyze_semantic_patterns(code, language);
+        let patterns = Self::analyze_semantic_patterns(code, language);
         let total_complexity: f64 = patterns.iter().sum();
         let function_count = patterns.len();
 
@@ -35,35 +35,39 @@ impl SemanticComplexityStats {
             0.0
         };
 
-        self.max_complexity = patterns.iter().fold(0.0, |acc, value| acc.max(*value));
+        self.max_complexity = patterns
+            .iter()
+            .fold(0.0, |acc, complexity| acc.max(*complexity));
 
-        self.min_complexity = patterns.iter().fold(f64::MAX, |acc, value| acc.min(*value));
+        self.min_complexity = patterns
+            .iter()
+            .fold(f64::MAX, |acc, complexity| acc.min(*complexity));
 
         self.semantic_score = (self.average_complexity / 100.0 * 100.0).min(100.0);
         self.semantic_score
     }
 
-    fn analyze_semantic_patterns(&self, code: &str, language: LANG) -> Vec<f64> {
+    fn analyze_semantic_patterns(code: &str, language: LANG) -> Vec<f64> {
         let mut patterns = Vec::new();
-        let functions = self.extract_functions(code, language);
+        let functions = Self::extract_functions(code, language);
 
         for func in functions {
-            let complexity = self.analyze_function_complexity(&func, language);
+            let complexity = Self::analyze_function_complexity(&func, language);
             patterns.push(complexity);
         }
 
         patterns
     }
 
-    fn extract_functions(&self, code: &str, language: LANG) -> Vec<FunctionInfo> {
+    fn extract_functions(code: &str, language: LANG) -> Vec<FunctionInfo> {
         let mut functions = Vec::new();
         let lines: Vec<&str> = code.lines().collect();
 
-        for line in lines.iter() {
-            if self.is_function_line(line, language) {
+        for line in &lines {
+            if Self::is_function_line(line, language) {
                 functions.push(FunctionInfo {
-                    name: self.extract_function_name(line),
-                    content: line.to_string(),
+                    name: Self::extract_function_name(line),
+                    content: (*line).to_string(),
                 });
             }
         }
@@ -71,22 +75,21 @@ impl SemanticComplexityStats {
         functions
     }
 
-    fn is_function_line(&self, line: &str, language: LANG) -> bool {
+    fn is_function_line(line: &str, language: LANG) -> bool {
         match language {
             LANG::Rust => line.trim().starts_with("fn "),
             LANG::Python => line.trim().starts_with("def "),
             LANG::Javascript | LANG::Typescript => {
                 line.trim().starts_with("function ") || line.contains("=>")
             }
-            LANG::Java => line.trim().contains("(") && line.trim().contains(")"),
-            LANG::Cpp => line.trim().contains("(") && line.trim().contains(")"),
+            LANG::Java | LANG::Cpp => line.trim().contains('(') && line.trim().contains(')'),
             _ => false,
         }
     }
 
     /// Check if a line is a function definition using custom patterns
     #[allow(dead_code)]
-    fn is_function_line_with_patterns(&self, line: &str, function_patterns: &[String]) -> bool {
+    fn is_function_line_with_patterns(line: &str, function_patterns: &[String]) -> bool {
         let trimmed = line.trim();
         function_patterns
             .iter()
@@ -96,18 +99,17 @@ impl SemanticComplexityStats {
     /// Extract functions using custom patterns
     #[allow(dead_code)]
     fn extract_functions_with_patterns(
-        &self,
         code: &str,
         function_patterns: &[String],
     ) -> Vec<FunctionInfo> {
         let mut functions = Vec::new();
         let lines: Vec<&str> = code.lines().collect();
 
-        for line in lines.iter() {
-            if self.is_function_line_with_patterns(line, function_patterns) {
+        for line in &lines {
+            if Self::is_function_line_with_patterns(line, function_patterns) {
                 functions.push(FunctionInfo {
-                    name: self.extract_function_name(line),
-                    content: line.to_string(),
+                    name: Self::extract_function_name(line),
+                    content: (*line).to_string(),
                 });
             }
         }
@@ -115,7 +117,7 @@ impl SemanticComplexityStats {
         functions
     }
 
-    fn extract_function_name(&self, line: &str) -> String {
+    fn extract_function_name(line: &str) -> String {
         let trimmed = line.trim();
         if let Some(start) = trimmed.find("fn ") {
             let after_fn = &trimmed[start + 3..];
@@ -126,32 +128,32 @@ impl SemanticComplexityStats {
         "unknown".to_string()
     }
 
-    fn analyze_function_complexity(&self, func: &FunctionInfo, language: LANG) -> f64 {
+    fn analyze_function_complexity(func: &FunctionInfo, language: LANG) -> f64 {
         let mut complexity_weight = 0.0;
 
-        complexity_weight += self.analyze_name_complexity(&func.name);
-        complexity_weight += self.analyze_content_complexity(&func.content, language);
+        complexity_weight += Self::analyze_name_complexity(&func.name);
+        complexity_weight += Self::analyze_content_complexity(&func.content, language);
 
-        if self.has_business_logic(&func.content) {
+        if Self::has_business_logic(&func.content) {
             complexity_weight += 10.0;
         }
 
-        if self.has_multiple_responsibilities(&func.content) {
+        if Self::has_multiple_responsibilities(&func.content) {
             complexity_weight += 15.0;
         }
 
-        if self.has_data_transformation(&func.content) {
+        if Self::has_data_transformation(&func.content) {
             complexity_weight += 8.0;
         }
 
-        if self.has_complex_control_flow(&func.content) {
+        if Self::has_complex_control_flow(&func.content) {
             complexity_weight += 12.0;
         }
 
         complexity_weight.clamp(0.0, 100.0)
     }
 
-    fn analyze_name_complexity(&self, name: &str) -> f64 {
+    fn analyze_name_complexity(name: &str) -> f64 {
         let mut complexity = 0.0;
 
         if name.len() > 20 {
@@ -167,10 +169,10 @@ impl SemanticComplexityStats {
         complexity
     }
 
-    fn analyze_content_complexity(&self, content: &str, language: LANG) -> f64 {
+    fn analyze_content_complexity(content: &str, language: LANG) -> f64 {
         let mut complexity = 0.0;
 
-        let keywords = self.get_language_keywords(language);
+        let keywords = Self::get_language_keywords(language);
         for keyword in keywords {
             let count = content.matches(&keyword).count();
             complexity += count as f64 * 0.5;
@@ -185,7 +187,7 @@ impl SemanticComplexityStats {
         complexity
     }
 
-    fn has_business_logic(&self, content: &str) -> bool {
+    fn has_business_logic(content: &str) -> bool {
         let business_keywords = [
             "calculate",
             "process",
@@ -199,28 +201,28 @@ impl SemanticComplexityStats {
             .any(|keyword| content.to_lowercase().contains(keyword))
     }
 
-    fn has_multiple_responsibilities(&self, content: &str) -> bool {
+    fn has_multiple_responsibilities(content: &str) -> bool {
         let responsibility_keywords = ["and", "also", "then", "additionally", "furthermore"];
         responsibility_keywords
             .iter()
             .any(|keyword| content.to_lowercase().contains(keyword))
     }
 
-    fn has_data_transformation(&self, content: &str) -> bool {
+    fn has_data_transformation(content: &str) -> bool {
         let transform_keywords = ["map", "filter", "reduce", "transform", "convert", "parse"];
         transform_keywords
             .iter()
             .any(|keyword| content.to_lowercase().contains(keyword))
     }
 
-    fn has_complex_control_flow(&self, content: &str) -> bool {
+    fn has_complex_control_flow(content: &str) -> bool {
         let control_keywords = ["if", "else", "switch", "case", "for", "while", "do"];
         control_keywords
             .iter()
             .any(|keyword| content.to_lowercase().contains(keyword))
     }
 
-    fn get_language_keywords(&self, language: LANG) -> Vec<&'static str> {
+    fn get_language_keywords(language: LANG) -> Vec<&'static str> {
         match language {
             LANG::Rust => vec![
                 "fn", "struct", "impl", "trait", "enum", "match", "if", "let", "mut",
@@ -263,7 +265,7 @@ mod tests {
     #[test]
     fn test_semantic_complexity_calculation() {
         let mut stats = SemanticComplexityStats::default();
-        let code = r#"
+        let code = r"
         fn calculate_user_score(user: User, orders: Vec<Order>) -> f64 {
             let mut total_score = 0.0;
             for order in orders {
@@ -273,7 +275,7 @@ mod tests {
             }
             total_score
         }
-        "#;
+        ";
 
         let complexity = stats.calculate_semantic_complexity(code, LANG::Rust);
         assert!(complexity > 0.0);
