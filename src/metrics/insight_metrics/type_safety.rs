@@ -200,19 +200,19 @@ mod tests {
 
         let metrics = analyze_typescript_type_safety(code);
         assert!(metrics.type_safety_score > 0.0);
-        assert_eq!(metrics.unsafe_ratio, 0.0);
+        assert!((metrics.unsafe_ratio - 0.0).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_python_type_safety() {
-        let code = r#"
+        let code = r"
             def calculate(x: int, y: int) -> int:
                 return x + y
 
             class Handler:
                 def process(self, data: str) -> bool:
                     return len(data) > 0
-        "#;
+        ";
 
         let metrics = analyze_python_type_safety(code);
         assert!(metrics.type_safety_score > 0.0);
