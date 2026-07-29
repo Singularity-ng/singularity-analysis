@@ -420,7 +420,7 @@ fn dump_npa(
 
 fn dump_value(
     name: &str,
-    val: f64,
+    val_num: f64,
     prefix: &str,
     last: bool,
     stdout: &mut StandardStreamLock,
@@ -434,5 +434,5 @@ fn dump_value(
     write!(stdout, "{name}: ")?;
 
     color(stdout, Color::White)?;
-    writeln!(stdout, "{val}")
+    writeln!(stdout, "{val_num}")
 }
